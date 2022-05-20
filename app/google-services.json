@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "359487055716",
+    "project_id": "androidapp19n11",
+    "storage_bucket": "androidapp19n11.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:359487055716:android:da211cfc790e9c16ecbc71",
+        "android_client_info": {
+          "package_name": "com.quy.chatapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "359487055716-4kelsr0c2mo08a9vmb665ho9odsed00s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDRdzeVbBjEY6e6OQQp4BYfQtVQvFEVPtk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "359487055716-4kelsr0c2mo08a9vmb665ho9odsed00s.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
