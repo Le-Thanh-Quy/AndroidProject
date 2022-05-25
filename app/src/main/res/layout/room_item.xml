@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginVertical="10dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal">
+    <androidx.cardview.widget.CardView
+        android:id="@+id/layoutAvatar"
+        android:layout_width="wrap_content"
+
+        app:cardCornerRadius="100dp"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/roomImage"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/profile"/>
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/roomStatus"
+        android:layout_width="15dp"
+        android:backgroundTint="#5FD364"
+        app:cardCornerRadius="100dp"
+        android:layout_height="15dp"
+        android:layout_below="@+id/layoutAvatar"
+        android:layout_alignEnd="@+id/layoutAvatar"
+        android:layout_marginTop="-15dp"
+        android:layout_marginEnd="0dp">
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/roomName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_toEndOf="@+id/layoutAvatar"
+        android:fontFamily="sans-serif-black"
+        android:maxLines="2"
+        android:text="Lê Thanh Quý"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textFontWeight="500"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/roomLastMess"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/roomName"
+        android:maxWidth="150dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="7dp"
+        android:layout_toEndOf="@+id/layoutAvatar"
+        android:fontFamily="sans-serif-black"
+        android:maxLines="2"
+        android:singleLine="true"
+        android:text="Xin chào tất cả mọi người mình"
+        android:textAlignment="center"
+        android:textColor="#494949"
+        android:textFontWeight="400"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/roomTimeLastMess"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/roomName"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="7dp"
+        android:layout_toEndOf="@+id/roomLastMess"
+        android:fontFamily="sans-serif-black"
+        android:maxLines="2"
+        android:text="- 12-04-2022 12:00 AM"
+        android:textAlignment="center"
+        android:textColor="#1C55E3"
+        android:textFontWeight="400"
+        android:textSize="14sp" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/roomSeenStatus"
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:layout_above="@+id/roomTimeLastMess"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="0dp"
+        android:layout_marginBottom="-20dp"
+        app:cardCornerRadius="100dp">
+
+        <ImageView
+            android:id="@+id/roomSeenImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/profile" />
+    </androidx.cardview.widget.CardView>
+</RelativeLayout>
