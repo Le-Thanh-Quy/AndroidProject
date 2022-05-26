@@ -1,66 +1,70 @@
 package com.quy.chatapp.Fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.quy.chatapp.Model.Room;
+import com.quy.chatapp.Model.User;
+import com.quy.chatapp.ModelView.ListFriend;
+import com.quy.chatapp.ModelView.ListRoom;
 import com.quy.chatapp.R;
+import com.quy.chatapp.databinding.FragmentFriendBinding;
+import com.quy.chatapp.databinding.FragmentGroupBinding;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link GroupFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class GroupFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    Context context;
+    FragmentGroupBinding binding;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public GroupFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment GroupFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static GroupFragment newInstance(String param1, String param2) {
-        GroupFragment fragment = new GroupFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+    public GroupFragment(Context context) {
+        this.context = context;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_group, container, false);
+        binding = FragmentGroupBinding.inflate(inflater, container,false);
+        return binding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        listFriendController();
+    }
+
+    List<Room> listData;
+    ListRoom listRoom ;
+
+    private void listFriendController() {
+        listData = new ArrayList<Room>();
+        listData = Arrays.asList(
+                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Nhóm chat vui vẻ", "group", "+84384933379", true),
+                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "ABC", "group", "+84384933379", true),
+                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Đồ án", "group", "+84384933379", true),
+                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "19TCLC_DT4", "group", "+84384933379", true),
+                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Haha", "group", "+84384933379", true)
+        );
+        listRoom = new ListRoom(listData, context);
+        binding.listGroup.setHasFixedSize(true);
+        binding.listGroup.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
+        binding.listGroup.setAdapter(listRoom);
     }
 }

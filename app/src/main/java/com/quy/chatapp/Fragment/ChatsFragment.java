@@ -56,26 +56,26 @@ public class ChatsFragment extends Fragment {
     private void listRoomChatController() {
         listDataRoom = new ArrayList<Room>();
         listDataRoom = Arrays.asList(
-                new Room("1", "hello tất cả mọi người mình là quý", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat"),
-                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat"),
-                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat"),
-                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat"),
-                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat"),
-                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat"),
-                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat"),
-                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat"),
-                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat"),
-                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat"),
-                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat"),
-                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat"),
-                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat"),
-                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat"),
-                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat"),
-                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat"),
-                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat"),
-                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat"),
-                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat"),
-                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat")
+                new Room("1", "hello tất cả mọi người mình là quý", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
+                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
+                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
+                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
+                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
+                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
+                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
+                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
+                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
+                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
+                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
+                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
+                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
+                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
+                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
+                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
+                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
+                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
+                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
+                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true)
         );
         listRoom = new ListRoom(listDataRoom, context);
         binding.listRoom.setHasFixedSize(true);

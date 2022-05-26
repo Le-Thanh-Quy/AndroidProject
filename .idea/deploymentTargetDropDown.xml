@@ -2,6 +2,7 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
     <runningDeviceTargetSelectedWithDropDown>
       <Target>
@@ -15,6 +16,8 @@
       </Target>
     </runningDeviceTargetSelectedWithDropDown>
 >>>>>>> e017bb9 ([1] main activity ui)
+=======
+>>>>>>> bcc4c59 ([2] main activity UI)
     <targetSelectedWithDropDown>
       <Target>
         <type value="QUICK_BOOT_TARGET" />

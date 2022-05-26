@@ -2,6 +2,7 @@ package com.quy.chatapp.ModelView;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,8 +47,18 @@ public class ListRoom extends RecyclerView.Adapter<ListRoom.viewHolder> {
         String time = room.getRoomTimeLastMess();
         String[] arrTime = time.split(" ");
         holder.roomTimeLastMess.setText("- " + arrTime[1] + " " + arrTime[2]);
+        if(room.getRoomType().equals("group")) {
+            holder.roomSeenStatus.setVisibility(View.INVISIBLE);
+            holder.roomStatus.setVisibility(View.INVISIBLE);
+        }
         if (!"null".equals(room.getImageRoom())) {
             Picasso.get().load(room.getImageRoom()).into(holder.roomImage);
+        }
+
+        if(!room.isSeen()) {
+            holder.roomLastMess.setTypeface(null, Typeface.BOLD);
+            holder.roomName.setTypeface(null, Typeface.BOLD);
+            holder.roomTimeLastMess.setTypeface(null, Typeface.BOLD);
         }
     }
 

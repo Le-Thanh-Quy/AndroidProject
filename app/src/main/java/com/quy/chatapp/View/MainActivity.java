@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
                     loadFragment(fragment);
                     return true;
                 case R.id.action_group:
-                    fragment = new GroupFragment();
+                    fragment = new GroupFragment(MainActivity.this);
                     loadFragment(fragment);
                     return true;
             }

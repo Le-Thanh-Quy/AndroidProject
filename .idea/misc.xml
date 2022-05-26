@@ -4,10 +4,14 @@
     <option name="filePathToZoomLevelMap">
       <map>
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> bcc4c59 ([2] main activity UI)
         <entry key="..\:/Users/ADMIN/.gradle/caches/transforms-3/c7220573e40aa30730232dde3fd8eccf/transformed/core-1.7.0/res/layout/custom_dialog.xml" value="0.12708333333333333" />
         <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/drawable-v24/border_input.xml" value="0.14322916666666666" />
         <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/drawable/background_shadow.xml" value="0.14322916666666666" />
         <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/drawable/border_radius_dialog.xml" value="0.14322916666666666" />
+<<<<<<< HEAD
         <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/drawable/custom_button.xml" value="0.13854166666666667" />
         <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/drawable/custom_icon_img.xml" value="0.13854166666666667" />
         <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/drawable/custom_input.xml" value="0.13854166666666667" />
@@ -35,13 +39,16 @@
         <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/layout/layout_option_image.xml" value="0.2" />
         <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/layout/loading_dialog.xml" value="0.2" />
 =======
+=======
+>>>>>>> bcc4c59 ([2] main activity UI)
         <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/drawable/search_icon.xml" value="0.234375" />
         <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/drawable/shadow.xml" value="0.14947916666666666" />
         <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/layout/activity_login.xml" value="0.259375" />
         <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/layout/activity_main.xml" value="0.264" />
+        <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/layout/custom_dialog_add_friend.xml" value="0.264" />
         <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/layout/fragment_chats.xml" value="0.4" />
         <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/layout/fragment_friend.xml" value="0.264" />
-        <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/layout/fragment_group.xml" value="0.13333333333333333" />
+        <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/layout/fragment_group.xml" value="0.2" />
         <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/layout/fragment_status.xml" value="0.259375" />
         <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/layout/friend_item.xml" value="0.4" />
 >>>>>>> e017bb9 ([1] main activity ui)
