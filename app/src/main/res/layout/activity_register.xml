@@ -22,8 +22,10 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
+        android:layout_marginBottom="0dp"
         android:gravity="center"
         android:orientation="vertical">
 
@@ -37,7 +39,7 @@
                 android:layout_width="70dp"
                 android:layout_height="80dp"
                 android:layout_marginTop="30dp"
-                android:src="@drawable/app_icon"/>
+                android:src="@drawable/app_icon" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -59,7 +61,7 @@
             android:src="@drawable/create_account_now" />
 
         <EditText
-            android:id="@+id/et_username"
+            android:id="@+id/et_phone_number"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_marginBottom="10dp"
@@ -152,8 +154,8 @@
             android:layout_marginTop="20dp"
             android:layout_marginEnd="0dp"
             android:backgroundTint="#50536C"
-            android:fontFamily="sans-serif-black"
             android:enabled="false"
+            android:fontFamily="sans-serif-black"
             android:text="Sign up"
             android:textAllCaps="false"
             android:textColor="#FFFFFF"
@@ -198,9 +200,30 @@
                 android:layout_height="60dp"
                 android:background="@drawable/background_icon_elipse"
                 android:padding="10dp"
-                android:src="@drawable/icon_instagram">
-
-            </ImageView>
+                android:src="@drawable/icon_instagram"></ImageView>
         </LinearLayout>
     </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/close_verification_code"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="0dp"
+        android:background="#8D000000"
+        android:visibility="gone">
+
+        <EditText
+            android:id="@+id/verification_code"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_centerInParent="true"
+            android:layout_marginHorizontal="20dp"
+            android:background="@drawable/input_signin"
+            android:fontFamily="sans-serif-black"
+            android:hint="Verification Code..."
+            android:padding="10dp"
+            android:textColor="@color/black"
+            android:textSize="18sp" />
+    </RelativeLayout>
 </RelativeLayout>
