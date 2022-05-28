@@ -56,26 +56,26 @@ public class ChatsFragment extends Fragment {
     private void listRoomChatController() {
         listDataRoom = new ArrayList<Room>();
         listDataRoom = Arrays.asList(
-                new Room("1", "hello tất cả mọi người mình là quý", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
-                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
-                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
-                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
-                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
-                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
-                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
-                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
-                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
-                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
-                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
-                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
-                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
-                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
-                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
-                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
-                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
-                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
-                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
-                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true)
+                new Room("null", "hello tất cả mọi người mình là quý", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
+                new Room("null", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
+                new Room("null", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
+                new Room("null", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
+                new Room("null", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
+                new Room("null", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
+                new Room("null", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
+                new Room("null", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
+                new Room("null", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
+                new Room("null", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
+                new Room("null", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
+                new Room("null", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
+                new Room("null", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
+                new Room("null", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
+                new Room("null", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
+                new Room("null", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
+                new Room("null", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
+                new Room("null", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
+                new Room("null", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true),
+                new Room("null", "hello", "12-04-2022 12:00 AM", "null" , "Lê Thanh Quý", "chat", "+84384933379", true)
         );
         listRoom = new ListRoom(listDataRoom, context);
         binding.listRoom.setHasFixedSize(true);
@@ -89,18 +89,18 @@ public class ChatsFragment extends Fragment {
     private void listUserOnlineController() {
         listDataUser = new ArrayList<User>();
         listDataUser = Arrays.asList(
-                new User("1", "Lê Thanh Quý", "null"),
-                new User("1", "Trần Nguyễn Anh Trình", "null"),
-                new User("1", "Thanh Quý", "null"),
-                new User("1", "Lê Quý", "null"),
-                new User("1", "Lê", "null"),
-                new User("1", "Quý", "null"),
-                new User("1", "Thanh", "null"),
-                new User("1", "Lê Quý Thanh", "null"),
-                new User("1", "Thanh Quý Lê", "null"),
-                new User("1", "Lê Thanh Quý", "null"),
-                new User("1", "Lê Thanh Quý", "null"),
-                new User("1", "Lê Thanh Quý", "null")
+                new User("null", "Lê Thanh Quý", "0384933379", true, "123123"),
+                new User("null", "Trần Nguyễn Anh Trình","0384933379", true, "123123"),
+                new User("null", "Thanh Quý", "0384933379", true, "123123"),
+                new User("null", "Lê Quý", "0384933379", true, "123123"),
+                new User("null", "Lê", "0384933379", true, "123123"),
+                new User("null", "Quý", "0384933379", true, "123123"),
+                new User("null", "Thanh", "0384933379", true, "123123"),
+                new User("null", "Lê Quý Thanh", "0384933379", true, "123123"),
+                new User("null", "Thanh Quý Lê", "0384933379", true, "123123"),
+                new User("null", "Lê Thanh Quý", "0384933379", true, "123123"),
+                new User("null", "Lê Thanh Quý", "0384933379", true, "123123"),
+                new User("null", "Lê Thanh Quý", "0384933379", true, "123123")
         );
         listUserOnline = new ListUserOnline(listDataUser, context);
         binding.listUserOnline.setHasFixedSize(true);

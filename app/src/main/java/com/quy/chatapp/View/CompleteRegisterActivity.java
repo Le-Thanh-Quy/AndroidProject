@@ -1,4 +1,4 @@
-package com.quy.chatapp;
+package com.quy.chatapp.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -27,11 +27,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.quy.chatapp.Model.User;
+import com.quy.chatapp.R;
 import com.quy.chatapp.databinding.ActivityCompleteRegisterBinding;
 
 import java.io.ByteArrayOutputStream;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 
 public class CompleteRegisterActivity extends AppCompatActivity {
 

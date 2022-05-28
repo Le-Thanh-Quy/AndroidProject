@@ -68,18 +68,16 @@ public class FriendFragment extends Fragment {
     private void listFriendController() {
         listData = new ArrayList<User>();
         listData = Arrays.asList(
-                new User("1", "Lê Thanh Quý", "null"),
-                new User("1", "Trần Nguyễn Anh Trình", "null"),
-                new User("1", "Thanh Quý", "null"),
-                new User("1", "Lê Quý", "null"),
-                new User("1", "Lê", "null"),
-                new User("1", "Quý", "null"),
-                new User("1", "Thanh", "null"),
-                new User("1", "Lê Quý Thanh", "null"),
-                new User("1", "Thanh Quý Lê", "null"),
-                new User("1", "Lê Thanh Quý", "null"),
-                new User("1", "Lê Thanh Quý", "null"),
-                new User("1", "Lê Thanh Quý", "null")
+                new User("null", "Lê Thanh Quý", "0384933379", true, "123123"),
+                new User("null", "Trần Nguyễn Anh Trình","0384933379", true, "123123"),
+                new User("null", "Thanh Quý", "0384933379", true, "123123"),
+                new User("null", "Lê Quý", "0384933379", true, "123123"),
+                new User("null", "Lê Quý Thanh", "0384933379", true, "123123"),
+                new User("null", "Thanh Quý Lê", "0384933379", true, "123123"),
+                new User("null", "Lê Thanh Quý", "0384933379", true, "123123"),
+                new User("null", "Lê Thanh Quý", "0384933379", true, "123123"),
+                new User("null", "Lê Thanh Quý", "0384933379", true, "123123")
+
         );
         listFriend = new ListFriend(listData, context);
         binding.listFriend.setHasFixedSize(true);
