@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    tools:context=".CompleteRegisterActivity">
+
+    <RelativeLayout
+        android:id="@+id/layout_name"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#FFFFFF"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/img_welcome"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="100dp"
+            android:src="@drawable/welcome" />
+
+        <ImageView
+            android:id="@+id/title_welcome"
+            android:layout_width="250dp"
+            android:layout_height="80dp"
+            android:layout_below="@+id/img_welcome"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="40dp"
+            android:src="@drawable/welcome_title" />
+
+        <EditText
+            android:id="@+id/et_user_name"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_below="@+id/title_welcome"
+            android:layout_centerHorizontal="true"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="40dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/input_signin"
+            android:drawablePadding="12dp"
+            android:ems="10"
+            android:fontFamily="sans-serif-black"
+            android:hint="Aaa..."
+            android:inputType="text"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:textColor="@color/black"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/add_name"
+            android:layout_width="150dp"
+            android:layout_height="60dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="20dp"
+            android:backgroundTint="#192497"
+            android:drawableRight="@drawable/draw_next_icon"
+            android:drawableTint="@color/white"
+            android:fontFamily="sans-serif-black"
+            android:text="Continue"
+            android:textColor="@color/white"
+            app:cornerRadius="15dp" />
+
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/layout_avatar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/card_view_avatar"
+            android:layout_width="180dp"
+            android:layout_height="180dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="130dp"
+            app:cardCornerRadius="100dp">
+
+            <ImageView
+                android:id="@+id/img_avatar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/profile" />
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/add_avatar"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_below="@+id/card_view_avatar"
+            android:layout_alignEnd="@+id/card_view_avatar"
+            android:layout_marginTop="-45dp"
+            android:layout_marginEnd="5dp"
+            android:backgroundTint="#CBF6D7"
+            app:cardCornerRadius="100dp">
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:src="@drawable/add_avatar" />
+        </androidx.cardview.widget.CardView>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/card_view_avatar"
+            android:layout_marginTop="20dp"
+            android:fontFamily="sans-serif-black"
+            android:text="Add your profile photo?"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="28sp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/complete_register"
+            android:layout_width="150dp"
+            android:layout_height="60dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="130dp"
+            android:backgroundTint="#192497"
+            android:drawableRight="@drawable/draw_sign_oke"
+            android:drawableTint="@color/white"
+            android:fontFamily="sans-serif-black"
+            android:text="Sign up"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            app:cornerRadius="15dp" />
+
+        <ImageView
+            android:id="@+id/back"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:src="@drawable/go_back_login"
+            app:tint="#192497" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="10dp"
+            android:fontFamily="sans-serif-black"
+            android:text="Follow the steps to complete the registration!!!"
+            android:textAlignment="center"
+            android:textColor="#750B0B"
+            android:textSize="16sp" />
+    </RelativeLayout>
+</LinearLayout>
