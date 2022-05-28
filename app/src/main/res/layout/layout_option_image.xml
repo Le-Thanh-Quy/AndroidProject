@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#57000000"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/option_image"
+        android:layout_gravity="center|center_horizontal"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:layout_margin="10dp">
+        <TextView
+            android:id="@+id/takePhoto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:fontFamily="sans-serif-medium"
+            android:textSize="18sp"
+            android:text="Take a photo"
+            android:textColor="@color/white" />
+
+        <TextView
+            android:id="@+id/chooseFromGallery"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:fontFamily="sans-serif-medium"
+            android:textSize="18sp"
+            android:text="Choose from gallery"
+            android:textColor="@color/white" />
+        <TextView
+            android:id="@+id/cancel_option"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:padding="10dp"
+            android:fontFamily="sans-serif-medium"
+            android:textSize="18sp"
+            android:textAlignment="center"
+            android:text="Cancel"
+            android:textColor="#E44848" />
+    </LinearLayout>
+</LinearLayout>

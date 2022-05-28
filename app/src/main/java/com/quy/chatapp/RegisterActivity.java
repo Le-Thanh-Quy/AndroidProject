@@ -1,14 +1,22 @@
 package com.quy.chatapp;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.Window;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -18,18 +26,25 @@ import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
+import com.google.firebase.auth.PhoneAuthOptions;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.quy.chatapp.databinding.ActivityRegisterBinding;
 
 import java.util.concurrent.TimeUnit;
 
 public class RegisterActivity extends AppCompatActivity {
     FirebaseAuth mAuth;
+    DatabaseReference database;
     String codeSent;
     ActivityRegisterBinding binding;
     boolean isPhoneTrue, isPasswordTrue, isRePasswordTrue = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,6 +53,7 @@ public class RegisterActivity extends AppCompatActivity {
         this.overridePendingTransition(R.anim.animation_enter,
                 R.anim.animation_leave);
         mAuth = FirebaseAuth.getInstance();
+        database = FirebaseDatabase.getInstance().getReference();
         addEvent();
     }
 
@@ -51,7 +67,6 @@ public class RegisterActivity extends AppCompatActivity {
         binding.btnSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                binding.closeVerificationCode.setVisibility(View.VISIBLE);
                 sendVerificationCode();
             }
         });
@@ -74,7 +89,7 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 String validNumber = "^[+|0]{1}[0-9]{9,11}$";
-                if(charSequence.toString().trim().matches(validNumber)) {
+                if (charSequence.toString().trim().matches(validNumber)) {
                     isPhoneTrue = true;
                 } else {
                     isPhoneTrue = false;
@@ -96,7 +111,7 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
-                if(charSequence.toString().trim().length() > 5) {
+                if (charSequence.toString().trim().length() > 5) {
                     isPasswordTrue = true;
                 } else {
                     isPasswordTrue = false;
@@ -117,7 +132,7 @@ public class RegisterActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if(charSequence.toString().equals(binding.etPassword.getText().toString().trim())) {
+                if (charSequence.toString().equals(binding.etPassword.getText().toString().trim())) {
                     isRePasswordTrue = true;
                 } else {
                     isRePasswordTrue = false;
@@ -138,7 +153,7 @@ public class RegisterActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if(charSequence.length() == 6) {
+                if (charSequence.length() == 6) {
                     verifySignInCode();
                 }
             }
@@ -151,7 +166,7 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void checkInput() {
-        if(isPhoneTrue && isPasswordTrue && isRePasswordTrue) {
+        if (isPhoneTrue && isPasswordTrue && isRePasswordTrue) {
             binding.btnSignUp.setEnabled(true);
             binding.btnSignUp.setBackgroundColor(Color.parseColor("#192497"));
         } else {
@@ -172,33 +187,47 @@ public class RegisterActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            //here you can open new activity
-                            Toast.makeText(getApplicationContext(),
-                                    "Login Successfull", Toast.LENGTH_LONG).show();
+                            Intent intent = new Intent(RegisterActivity.this, CompleteRegisterActivity.class);
+                            intent.putExtra("phone", phone);
+                            intent.putExtra("password", binding.etPassword.getText().toString().trim());
+                            startActivity(intent);
+
+                            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                            imm.hideSoftInputFromWindow(RegisterActivity.this.getCurrentFocus().getWindowToken(), 0);
                         } else {
                             if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
                                 Toast.makeText(getApplicationContext(),
-                                        "Incorrect Verification Code ", Toast.LENGTH_LONG).show();
+                                        "Incorrect Verification Code", Toast.LENGTH_LONG).show();
                             }
                         }
                     }
                 });
     }
 
+    String phone;
     private void sendVerificationCode() {
-        String phone = binding.etPhoneNumber.getText().toString();
+        phone = binding.etPhoneNumber.getText().toString();
         if (phone.charAt(0) != '+') {
             phone = "+84" + phone.substring(1);
         }
-        System.out.println("Phone: " + phone);
-        PhoneAuthProvider.getInstance().verifyPhoneNumber
-                (
-                        phone,
-                        120,
-                        TimeUnit.SECONDS,
-                        this,
-                        mCallbacks
-                );
+        database.child("Users").child(phone).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                if(task.getResult().exists()) {
+                    Toast.makeText(RegisterActivity.this, "Phone number already", Toast.LENGTH_SHORT).show();
+                } else {
+                    PhoneAuthOptions options =
+                            PhoneAuthOptions.newBuilder(mAuth)
+                                    .setPhoneNumber(phone)
+                                    .setTimeout(120L, TimeUnit.SECONDS)
+                                    .setActivity(RegisterActivity.this)
+                                    .setCallbacks(mCallbacks)
+                                    .build();
+                    PhoneAuthProvider.verifyPhoneNumber(options);
+                }
+            }
+        });
+
     }
 
 
@@ -216,6 +245,7 @@ public class RegisterActivity extends AppCompatActivity {
         public void onCodeSent(String s, PhoneAuthProvider.ForceResendingToken forceResendingToken) {
             super.onCodeSent(s, forceResendingToken);
             codeSent = s;
+            binding.closeVerificationCode.setVisibility(View.VISIBLE);
         }
     };
 }

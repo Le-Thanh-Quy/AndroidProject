@@ -10,20 +10,29 @@
         <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/drawable/custom_button.xml" value="0.13854166666666667" />
         <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/drawable/custom_icon_img.xml" value="0.13854166666666667" />
         <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/drawable/custom_input.xml" value="0.13854166666666667" />
+        <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/drawable/draw_next_icon.xml" value="0.14270833333333333" />
+        <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/drawable/draw_sign_oke.xml" value="0.14270833333333333" />
+        <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/drawable/empty_bac.xml" value="0.2712820512820513" />
         <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/drawable/ic_baseline_remove_red_eye_24.xml" value="0.13854166666666667" />
         <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/drawable/ic_launcher_background.xml" value="0.13854166666666667" />
+        <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/drawable/loading_dialog.xml" value="0.109375" />
+        <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/drawable/next_icon.xml" value="0.14270833333333333" />
+        <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/drawable/option_image.xml" value="0.2755208333333333" />
         <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/drawable/search_icon.xml" value="0.234375" />
         <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/drawable/shadow.xml" value="0.14947916666666666" />
+        <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/layout/activity_complete_register.xml" value="0.2" />
         <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/layout/activity_home.xml" value="0.176" />
         <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/layout/activity_login.xml" value="0.2" />
         <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/layout/activity_main.xml" value="0.264" />
-        <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/layout/activity_register.xml" value="0.136" />
+        <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/layout/activity_register.xml" value="0.264" />
         <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/layout/custom_dialog_add_friend.xml" value="0.264" />
         <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/layout/fragment_chats.xml" value="0.4" />
         <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/layout/fragment_friend.xml" value="0.264" />
         <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/layout/fragment_group.xml" value="0.2" />
         <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/layout/fragment_status.xml" value="0.259375" />
         <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/layout/friend_item.xml" value="0.4" />
+        <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/layout/layout_option_image.xml" value="0.2" />
+        <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/layout/loading_dialog.xml" value="0.2" />
         <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/layout/room_item.xml" value="0.4" />
         <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/layout/user_online_item.xml" value="0.264" />
         <entry key="..\:/Users/ADMIN/Desktop/AndroidProject/ChatApp/app/src/main/res/menu/my_navigation_items.xml" value="0.259375" />
