@@ -5,226 +5,241 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
+    android:orientation="vertical"
     android:overScrollMode="never"
     android:scrollbars="none">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <RelativeLayout
+        android:id="@+id/layout_title"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:overScrollMode="never"
-        android:scrollbars="none"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-
+        android:layout_height="60dp">
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/imageBack"
-            android:layout_width="@dimen/_30sdp"
-            android:layout_height="@dimen/_30sdp"
-            android:layout_marginStart="@dimen/_10sdp"
-            android:layout_marginLeft="@dimen/_16sdp"
-            android:layout_marginTop="@dimen/_12sdp"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
             android:padding="@dimen/_5sdp"
-            android:src="@drawable/ic_back"
-            android:tint="@color/primary"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_left"
+            android:tint="#192497"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="MissingConstraints" />
 
 
-
-        <com.makeramen.roundedimageview.RoundedImageView
+        <androidx.cardview.widget.CardView
             android:id="@+id/imageUser"
-            android:layout_width="@dimen/_30sdp"
-            android:layout_height="@dimen/_30sdp"
-            android:layout_marginStart="@dimen/_6sdp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="15dp"
             android:layout_marginTop="@dimen/_12sdp"
-            android:scaleType="centerCrop"
-            android:background="@drawable/background_image"
+            android:layout_toEndOf="@+id/imageBack"
             app:layout_constraintStart_toEndOf="@id/imageBack"
             app:layout_constraintTop_toTopOf="parent"
-            app:riv_corner_radius="@dimen/_30sdp"
-            tools:ignore="MissingConstraints" />
+            app:riv_corner_radius="@dimen/_30sdp">
 
-        <com.makeramen.roundedimageview.RoundedImageView
-            android:id="@+id/viewOnline"
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/profile" />
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/user_online"
             android:layout_width="10dp"
             android:layout_height="10dp"
-            android:background="@drawable/background_online"
-            app:layout_constraintTop_toTopOf="@id/textOnline"
-            app:layout_constraintBottom_toBottomOf="@id/textOnline"
-            app:layout_constraintEnd_toEndOf="@id/imageUser"
-            android:visibility="gone"
-            tools:ignore="MissingConstraints"/>
+            android:layout_below="@+id/imageUser"
+            android:layout_alignEnd="@+id/imageUser"
+            android:layout_marginTop="-10dp"
+            android:layout_marginEnd="3dp"
+            android:backgroundTint="#22AA1F"
+            app:cardCornerRadius="100dp" />
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/imageInfo"
-            android:layout_width="@dimen/_30sdp"
-            android:layout_height="@dimen/_30sdp"
-            android:layout_marginTop="@dimen/_12sdp"
-            android:layout_marginEnd="@dimen/_10sdp"
-            android:layout_marginRight="@dimen/_16sdp"
-            android:padding="@dimen/_4sdp"
-            android:src="@drawable/ic_info"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:tint="@color/primary"
-            tools:ignore="MissingConstraints" />
+        <ImageView
+            android:id="@+id/voice_call"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="15dp"
+            android:layout_toStartOf="@+id/call_video"
+            android:scaleType="centerCrop"
+            android:src="@drawable/phone_call"
+            app:tint="#192497" />
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/imageCallVideo"
-            android:layout_width="@dimen/_30sdp"
-            android:layout_height="@dimen/_30sdp"
-            android:layout_marginTop="@dimen/_12sdp"
-            android:layout_marginEnd="@dimen/_3sdp"
-            android:layout_marginRight="@dimen/_16sdp"
-            android:padding="@dimen/_1sdp"
-            android:src="@drawable/ic_call_video"
-            app:layout_constraintEnd_toStartOf="@id/imageInfo"
-            app:layout_constraintTop_toTopOf="parent"
-            android:tint="@color/primary"
-            tools:ignore="MissingConstraints" />
+        <ImageView
+            android:id="@+id/call_video"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="15dp"
+            android:layout_toStartOf="@+id/user_info"
+            android:scaleType="centerCrop"
+            android:src="@drawable/video_call"
+            app:tint="#192497" />
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/imageCall"
-            android:layout_width="@dimen/_30sdp"
-            android:layout_height="@dimen/_30sdp"
-            android:layout_marginTop="@dimen/_12sdp"
-            android:layout_marginEnd="@dimen/_3sdp"
-            android:layout_marginRight="@dimen/_16sdp"
-            android:padding="@dimen/_4sdp"
-            android:src="@drawable/ic_call"
-            app:layout_constraintEnd_toStartOf="@id/imageCallVideo"
-            app:layout_constraintTop_toTopOf="parent"
-            android:tint="@color/primary"
-            tools:ignore="MissingConstraints" />
+        <ImageView
+            android:id="@+id/user_info"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="10dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/info_user"
+            app:tint="#192497" />
 
         <TextView
             android:id="@+id/textName"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/_8sdp"
-            android:layout_marginEnd="@dimen/_8sdp"
-            android:paddingStart="@dimen/_2sdp"
+            android:layout_alignTop="@+id/imageUser"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="10dp"
+            android:layout_toStartOf="@+id/voice_call"
+            android:layout_toEndOf="@+id/imageUser"
             android:ellipsize="end"
+            android:fontFamily="sans-serif-black"
             android:gravity="left"
             android:maxLines="1"
+            android:paddingStart="@dimen/_2sdp"
+            android:text="Lê Thanh Quý"
             android:textColor="@color/primary_text"
             android:textSize="@dimen/_14ssp"
-            android:textStyle="bold"
-            android:text="Name"
-            app:layout_constraintTop_toTopOf="@id/imageUser"
-            app:layout_constraintEnd_toStartOf="@id/imageCall"
-            app:layout_constraintStart_toEndOf="@id/imageUser"
-            tools:ignore="MissingConstraints" />
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/textOnline"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/_8sdp"
-            android:layout_marginEnd="@dimen/_8sdp"
+            android:layout_below="@+id/textName"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="10dp"
+            android:layout_toStartOf="@+id/voice_call"
+            android:layout_toEndOf="@+id/imageUser"
             android:ellipsize="end"
-            android:paddingStart="@dimen/_2sdp"
-            android:text="Online"
+            android:fontFamily="sans-serif-black"
             android:maxLines="1"
-            android:textColor="@color/secondary_text"
-            android:textSize="@dimen/_9ssp"
-            app:layout_constraintEnd_toStartOf="@id/imageCall"
-            app:layout_constraintStart_toEndOf="@id/imageUser"
-            app:layout_constraintBottom_toBottomOf="@id/imageUser"
-            tools:ignore="MissingConstraints" />
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/layoutInput"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/_35sdp"
-            android:background="@drawable/background_chat_input"
-            android:layout_marginStart="@dimen/_10sdp"
-            android:layout_marginEnd="@dimen/_10sdp"
-            android:layout_marginBottom="@dimen/_10sdp"
             android:paddingStart="@dimen/_2sdp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            tools:ignore="MissingConstraints">
+            android:text="Đang hoạt dộng"
+            android:textColor="@color/secondary_text"
+            android:textSize="@dimen/_9ssp" />
+    </RelativeLayout>
+
+    <View
+        android:id="@+id/viewSupporter"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/layout_title"
+        android:layout_marginTop="0dp"
+        android:background="#DADADA" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/chatRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/layout_input"
+        android:layout_below="@+id/viewSupporter"
+        android:layout_marginTop="0dp"
+        android:layout_marginBottom="0dp"
+        android:clipToPadding="false"
+        android:orientation="vertical"
+        android:padding="@dimen/_10sdp"
+        android:visibility="visible"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+    <RelativeLayout
+        android:id="@+id/layout_input"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="0dp"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/chooseImageSend"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="0dp"
+            android:padding="@dimen/_5sdp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/add_photo"
+            android:tint="@color/primary"
+            app:tint="#192497" />
+
+        <EditText
+            android:id="@+id/inputMessage"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="10dp"
+            android:layout_toStartOf="@+id/layout_send"
+            android:layout_toEndOf="@+id/chooseImageSend"
+            android:background="@drawable/input_mess"
+            android:fontFamily="sans-serif-black"
+            android:hint="Aaa..."
+            android:imeOptions="actionDone"
+            android:importantForAutofill="no"
+            android:inputType="text"
+            android:paddingHorizontal="10dp"
+            android:textColor="#000000"
+            android:textCursorDrawable="@drawable/color_cursor" />
+
+        <LinearLayout
+            android:id="@+id/layout_send"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="0dp"
+            android:orientation="horizontal">
 
             <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/chooseImageSend"
-                android:layout_width="@dimen/_35sdp"
-                android:layout_height="@dimen/_35sdp"
-                android:padding="@dimen/_5sdp"
-                android:src="@drawable/ic_send_image"
-                android:tint="@color/primary"
-                app:layout_constraintStart_toStartOf="@id/layoutInput"
-                app:layout_constraintBottom_toBottomOf="parent"/>
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/imageSend"
-                android:layout_width="@dimen/_35sdp"
-                android:layout_height="@dimen/_35sdp"
+                android:id="@+id/send_icon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:padding="@dimen/_6sdp"
-                android:src="@drawable/ic_send"
+                android:scaleType="centerCrop"
+                android:src="@drawable/like_mess"
                 android:tint="@color/primary"
-                app:layout_constraintEnd_toEndOf="@id/layoutInput"
-                app:layout_constraintBottom_toBottomOf="parent"/>
+                app:tint="#192497" />
 
-            <EditText
-                android:id="@+id/inputMessage"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/_40sdp"
-                android:hint="Nhập tin nhắn..."
-                android:textColor="@color/primary_text"
-                android:imeOptions="actionDone"
-                android:importantForAutofill="no"
-                android:inputType="text"
-                android:textCursorDrawable="@drawable/color_cursor"
-                android:backgroundTint="#f0f2f5"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@id/chooseImageSend"
-                app:layout_constraintEnd_toStartOf="@id/imageSend"
-                />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/send_mess"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:padding="@dimen/_6sdp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/send_mess"
+                android:tint="@color/primary"
+                android:visibility="gone"
+                app:tint="#192497" />
+        </LinearLayout>
 
-        <View
-            android:id="@+id/viewSupporter"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="@dimen/_5sdp"
-            app:layout_constraintTop_toBottomOf="@id/imageBack"
-            tools:ignore="MissingConstraints" />
+    </RelativeLayout>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/chatRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:clipToPadding="false"
-            android:orientation="vertical"
-            android:overScrollMode="never"
-            android:padding="@dimen/_10sdp"
-            android:visibility="gone"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintBottom_toTopOf="@id/layoutInput"
-            app:layout_constraintTop_toBottomOf="@id/viewSupporter"
-            app:layout_constraintVertical_bias="0.0"
-            app:stackFromEnd="true"
-            tools:ignore="MissingConstraints"
-            tools:layout_editor_absoluteX="84dp" />
 
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="@dimen/_25sdp"
-            android:layout_height="@dimen/_25sdp"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            tools:ignore="MissingConstraints" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="@dimen/_25sdp"
+        android:layout_height="@dimen/_25sdp"
+        android:layout_centerInParent="true"
+        android:indeterminate="true"
+        android:indeterminateTintMode="src_atop"
+        android:indeterminateTint="@color/black"
+        tools:ignore="MissingConstraints" />
 </RelativeLayout>
