@@ -11,6 +11,11 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.quy.chatapp.Model.User;
 import com.quy.chatapp.R;
 import com.squareup.picasso.Picasso;
@@ -21,10 +26,12 @@ public class ListUserOnline extends RecyclerView.Adapter<ListUserOnline.viewHold
 
     public List<User> listData;
     public Context context;
+    private DatabaseReference reference;
 
     public ListUserOnline(List<User> listData, Context context) {
         this.listData = listData;
         this.context = context;
+        reference = FirebaseDatabase.getInstance().getReference();
     }
 
     @NonNull
@@ -36,13 +43,50 @@ public class ListUserOnline extends RecyclerView.Adapter<ListUserOnline.viewHold
 
     @Override
     public void onBindViewHolder(@NonNull viewHolder holder, int position) {
+        int currentPosition = position;
         User user = listData.get(position);
+        reference.child("Users").child(user.getPhoneNumber()).child("status").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.getValue() != null) {
+                    if (!snapshot.getValue(Boolean.class)) {
+                        holder.itemView.setVisibility(View.GONE);
+                        ViewGroup.LayoutParams params = holder.itemView.getLayoutParams();
+                        params.height = 0;
+                        params.width = 0;
+                        holder.itemView.setLayoutParams(params);
+                    } else {
+                        holder.itemView.setVisibility(View.VISIBLE);
+                        ViewGroup.LayoutParams params = holder.itemView.getLayoutParams();
+                        params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                        params.width = (int) pxFromDp(context, 90f);
+                        holder.itemView.setLayoutParams(params);
+                    }
+                }
+            }
 
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
         holder.userName.setText(user.getUserName());
         if (!"null".equals(user.getUserAvatar())) {
-            Picasso.get().load(user.getUserAvatar()).into(holder.userAvatar);
+            Picasso.get()
+                    .load(user.getUserAvatar()) // web image url
+                    .fit().centerInside()
+//                    .rotate(90)                    //if you want to rotate by 90 degrees
+                    .error(R.drawable.profile)
+                    .placeholder(R.drawable.profile)
+                    .into(holder.userAvatar);
+        } else {
+            holder.userAvatar.setImageDrawable(context.getDrawable(R.drawable.profile));
         }
 
+    }
+
+    public static float pxFromDp(final Context context, final float dp) {
+        return dp * context.getResources().getDisplayMetrics().density;
     }
 
     @Override

@@ -1,60 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".Fragment.ChatsFragment">
 
-    <ScrollView
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+        <ProgressBar
+            android:id="@+id/load_fragment"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="100dp"
+            android:foregroundTint="@color/black"
+            android:indeterminateTint="@color/black"
+            android:indeterminateTintMode="src_atop" />
 
-            <androidx.cardview.widget.CardView
-                android:id="@+id/layoutSearch"
+        <ImageView
+            android:id="@+id/not_found"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_centerInParent="true"
+            android:visibility="gone"
+            android:src="@drawable/conversation_person" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <RelativeLayout
                 android:layout_width="match_parent"
-                app:cardCornerRadius="15dp"
-                android:layout_marginVertical="10dp"
-                android:layout_marginHorizontal="15dp"
-                android:layout_height="wrap_content">
-                <EditText
-                    android:id="@+id/searchRoom"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/layoutSearch"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="#1A0D2F8A"
-                    android:drawableLeft="@drawable/search_icon"
-                    android:padding="8dp"
-                    android:fontFamily="sans-serif-black"
-                    android:drawablePadding="10dp"
-                    android:textFontWeight="500"
-                    android:hint="Tìm kiếm" />
-            </androidx.cardview.widget.CardView>
+                    android:layout_marginHorizontal="15dp"
+                    android:layout_marginVertical="10dp"
+                    app:cardCornerRadius="15dp">
+
+                    <EditText
+                        android:id="@+id/searchRoom"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#1A0D2F8A"
+                        android:drawableLeft="@drawable/search_icon"
+                        android:drawablePadding="10dp"
+                        android:fontFamily="sans-serif-black"
+                        android:hint="Search..."
+                        android:padding="8dp"
+                        android:textFontWeight="500" />
+                </androidx.cardview.widget.CardView>
 
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/listUserOnline"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/layoutSearch"
-                android:layout_marginTop="0dp" />
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/listUserOnline"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/layoutSearch"
+                    android:layout_marginTop="0dp" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/listRoom"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/listUserOnline"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentEnd="true"
-                android:layout_marginStart="15dp"
-                android:layout_marginTop="0dp"
-                android:layout_marginEnd="15dp" />
-        </RelativeLayout>
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/listRoom"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/listUserOnline"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginStart="15dp"
+                    android:layout_marginTop="0dp"
+                    android:layout_marginEnd="15dp" />
 
-    </ScrollView>
+            </RelativeLayout>
+
+        </ScrollView>
+    </RelativeLayout>
+
 
 </FrameLayout>

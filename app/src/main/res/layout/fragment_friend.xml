@@ -8,6 +8,23 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+        <ProgressBar
+            android:id="@+id/load_fragment"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="100dp"
+            android:foregroundTint="@color/black"
+            android:indeterminateTint="@color/black"
+            android:indeterminateTintMode="src_atop" />
+
+        <ImageView
+            android:id="@+id/not_found"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_centerInParent="true"
+            android:visibility="gone"
+            android:src="@drawable/conversation_person" />
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -17,24 +34,28 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
+
+
+
                 <androidx.cardview.widget.CardView
                     android:id="@+id/layoutSearch"
                     android:layout_width="match_parent"
-                    app:cardCornerRadius="15dp"
-                    android:layout_marginVertical="10dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginHorizontal="15dp"
-                    android:layout_height="wrap_content">
+                    android:layout_marginVertical="10dp"
+                    app:cardCornerRadius="15dp">
+
                     <EditText
                         android:id="@+id/searchFriend"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="#1A0D2F8A"
                         android:drawableLeft="@drawable/search_icon"
-                        android:padding="8dp"
-                        android:fontFamily="sans-serif-black"
                         android:drawablePadding="10dp"
-                        android:textFontWeight="500"
-                        android:hint="Tìm kiếm" />
+                        android:fontFamily="sans-serif-black"
+                        android:hint="Search..."
+                        android:padding="8dp"
+                        android:textFontWeight="500" />
                 </androidx.cardview.widget.CardView>
 
                 <androidx.recyclerview.widget.RecyclerView

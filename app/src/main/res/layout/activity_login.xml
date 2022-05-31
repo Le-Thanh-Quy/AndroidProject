@@ -50,7 +50,7 @@
             android:paddingEnd="12dp"
             android:drawablePadding="12dp"
             android:ems="10"
-            android:inputType="text"
+            android:inputType="phone"
             android:hint="Phone Number"
             android:textSize="14sp"
             android:background="@drawable/input_signin"

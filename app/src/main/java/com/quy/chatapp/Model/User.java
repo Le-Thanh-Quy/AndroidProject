@@ -1,6 +1,8 @@
 package com.quy.chatapp.Model;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
     private static User instance;
     public String userAvatar;
     public String userName;

@@ -3,6 +3,7 @@ package com.quy.chatapp.View;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -36,6 +37,7 @@ public class RegisterActivity extends AppCompatActivity {
     String codeSent;
     ActivityRegisterBinding binding;
     boolean isPhoneTrue, isPasswordTrue, isRePasswordTrue = false;
+    ProgressDialog progress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,11 +51,16 @@ public class RegisterActivity extends AppCompatActivity {
         addEvent();
     }
 
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(0, 0);
+    }
     private void addEvent() {
         binding.goBackLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                finishAndRemoveTask();
+                finish();
             }
         });
         binding.btnSignUp.setOnClickListener(new View.OnClickListener() {
@@ -203,6 +210,15 @@ public class RegisterActivity extends AppCompatActivity {
                 if(task.getResult().exists()) {
                     Toast.makeText(RegisterActivity.this, "Phone number already", Toast.LENGTH_SHORT).show();
                 } else {
+                    progress = new ProgressDialog(RegisterActivity.this);
+                    progress.setTitle("Loading");
+                    progress.setMessage("Please wait...");
+                    progress.setCancelable(false);
+                    try {
+                        progress.show();
+                    } catch (Exception e) {
+                        System.out.println(e.toString());
+                    }
                     PhoneAuthOptions options =
                             PhoneAuthOptions.newBuilder(mAuth)
                                     .setPhoneNumber(phone)
@@ -233,6 +249,7 @@ public class RegisterActivity extends AppCompatActivity {
             super.onCodeSent(s, forceResendingToken);
             codeSent = s;
             binding.closeVerificationCode.setVisibility(View.VISIBLE);
+            progress.dismiss();
         }
     };
 }

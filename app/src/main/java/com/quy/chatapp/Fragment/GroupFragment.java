@@ -12,6 +12,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.quy.chatapp.Model.Room;
 import com.quy.chatapp.Model.User;
 import com.quy.chatapp.ModelView.ListFriend;
@@ -26,11 +31,15 @@ import java.util.List;
 
 public class GroupFragment extends Fragment {
 
+    private DatabaseReference reference;
     Context context;
     FragmentGroupBinding binding;
+    String phone;
 
     public GroupFragment(Context context) {
         this.context = context;
+        reference = FirebaseDatabase.getInstance().getReference();
+        phone = User.getInstance().getPhoneNumber();
     }
 
     @Override
@@ -55,16 +64,38 @@ public class GroupFragment extends Fragment {
 
     private void listFriendController() {
         listData = new ArrayList<Room>();
-        listData = Arrays.asList(
-                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Nhóm chat vui vẻ", "group", "+84384933379", true),
-                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "ABC", "group", "+84384933379", true),
-                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Đồ án", "group", "+84384933379", true),
-                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "19TCLC_DT4", "group", "+84384933379", true),
-                new Room("1", "hello", "12-04-2022 12:00 AM", "null" , "Haha", "group", "+84384933379", true)
-        );
         listRoom = new ListRoom(listData, context);
         binding.listGroup.setHasFixedSize(true);
         binding.listGroup.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
         binding.listGroup.setAdapter(listRoom);
+        addEventListenRoom();
+    }
+
+    private void addEventListenRoom() {
+        reference.child("Users").child(phone).child("rooms").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                listData.clear();
+                for(DataSnapshot dataSnapshot: snapshot.getChildren()) {
+                    Room room = dataSnapshot.getValue(Room.class);
+                    assert room != null;
+                    if(room.getRoomType().equals("group")) {
+                        listData.add(room);
+                    }
+                }
+                binding.loadFragment.setVisibility(View.GONE);
+                if(listData.isEmpty()) {
+                    binding.notFound.setVisibility(View.VISIBLE);
+                } else {
+                    binding.notFound.setVisibility(View.GONE);
+                }
+                listRoom.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 }

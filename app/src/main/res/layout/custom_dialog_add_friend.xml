@@ -3,7 +3,6 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@drawable/border_radius_dialog"
     android:orientation="vertical">
     <LinearLayout
         android:layout_width="300dp"
@@ -16,10 +15,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="10dp"
-            android:layout_marginVertical="20dp"
+            android:layout_marginTop="20dp"
             android:background="@drawable/border_input"
             android:fontFamily="sans-serif-black"
-            android:hint="Nhập số điện thoại..."
+            android:hint="Enter a phone number..."
+            android:inputType="phone"
+            android:maxLength="12"
+            android:imeOptions="actionDone"
             android:padding="13dp"
             android:textColor="@color/black"
             android:textFontWeight="500"
@@ -29,7 +31,9 @@
             android:id="@+id/result_search"
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            android:layout_marginHorizontal="5dp"
+            android:paddingTop="20dp"
+            android:background="@drawable/border_input"
+            android:layout_marginHorizontal="10dp"
             android:visibility="gone">
 
             <androidx.cardview.widget.CardView
@@ -43,6 +47,7 @@
                     android:id="@+id/avatar_result"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
                     android:src="@drawable/profile" />
             </androidx.cardview.widget.CardView>
 

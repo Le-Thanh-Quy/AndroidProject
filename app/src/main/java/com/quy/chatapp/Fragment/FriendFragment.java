@@ -23,11 +23,20 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.quy.chatapp.Model.User;
 import com.quy.chatapp.ModelView.ListFriend;
 import com.quy.chatapp.R;
 import com.quy.chatapp.databinding.FragmentFriendBinding;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,11 +44,15 @@ import java.util.List;
 
 public class FriendFragment extends Fragment {
 
+    private DatabaseReference reference;
     Context context;
     FragmentFriendBinding binding;
+    String phone;
 
     public FriendFragment(Context context) {
         this.context = context;
+        reference = FirebaseDatabase.getInstance().getReference();
+        phone = User.getInstance().getPhoneNumber();
     }
 
 
@@ -67,22 +80,46 @@ public class FriendFragment extends Fragment {
 
     private void listFriendController() {
         listData = new ArrayList<User>();
-        listData = Arrays.asList(
-                new User("null", "Lê Thanh Quý", "0384933379", true, "123123"),
-                new User("null", "Trần Nguyễn Anh Trình","0384933379", true, "123123"),
-                new User("null", "Thanh Quý", "0384933379", true, "123123"),
-                new User("null", "Lê Quý", "0384933379", true, "123123"),
-                new User("null", "Lê Quý Thanh", "0384933379", true, "123123"),
-                new User("null", "Thanh Quý Lê", "0384933379", true, "123123"),
-                new User("null", "Lê Thanh Quý", "0384933379", true, "123123"),
-                new User("null", "Lê Thanh Quý", "0384933379", true, "123123"),
-                new User("null", "Lê Thanh Quý", "0384933379", true, "123123")
-
-        );
         listFriend = new ListFriend(listData, context);
         binding.listFriend.setHasFixedSize(true);
         binding.listFriend.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
         binding.listFriend.setAdapter(listFriend);
+        addEventListenFriend();
+    }
+
+    private void addEventListenFriend() {
+        reference.child("Users").child(phone).child("friends").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                listData.clear();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    String userPhoneNumber = dataSnapshot.getValue(String.class);
+                    assert userPhoneNumber != null;
+                    reference.child("Users").child(userPhoneNumber).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DataSnapshot> task) {
+                            if (task.getResult().getValue() != null) {
+                                User user = task.getResult().getValue(User.class);
+                                assert user != null;
+                                listData.add(user);
+                                if(listData.isEmpty()) {
+                                    binding.notFound.setVisibility(View.VISIBLE);
+                                } else {
+                                    binding.notFound.setVisibility(View.GONE);
+                                }
+                                listFriend.notifyDataSetChanged();
+                            }
+                        }
+                    });
+                }
+                binding.loadFragment.setVisibility(View.GONE);
+                listFriend.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
     }
 
     private void addEvent() {
@@ -116,8 +153,37 @@ public class FriendFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 String validNumber = "^[+|0]{1}[0-9]{9,11}$";
-                if (charSequence.toString().matches(validNumber)) {
-                    result_search.setVisibility(View.VISIBLE);
+                String search_phone = charSequence.toString().trim();
+                if (search_phone.length() > 0) {
+                    if (search_phone.charAt(0) != '+') {
+                        search_phone = "+84" + search_phone.substring(1);
+                    }
+                }
+                if (search_phone.matches(validNumber)) {
+                    reference.child("Users").child(search_phone).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DataSnapshot> task) {
+                            if (task.getResult().exists()) {
+                                User user = task.getResult().getValue(User.class);
+                                name_result.setText(user.getUserName());
+                                if (!"null".equals(user.getUserAvatar())) {
+                                    Picasso.get()
+                                            .load(user.getUserAvatar())
+                                            .fit().centerInside()
+//                                            .rotate(90)
+                                            .error(R.drawable.profile)
+                                            .placeholder(R.drawable.profile)
+                                            .into(avatar_result);
+                                } else {
+                                    avatar_result.setImageDrawable(context.getDrawable(R.drawable.profile));
+                                }
+                                result_search.setVisibility(View.VISIBLE);
+                            } else {
+                                result_search.setVisibility(View.GONE);
+                            }
+                        }
+                    });
+
                 } else {
                     result_search.setVisibility(View.GONE);
                 }
@@ -131,6 +197,30 @@ public class FriendFragment extends Fragment {
         no_add_friend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                String search_phone = phone_number.getText().toString().trim();
+                if (search_phone.length() > 0) {
+                    if (search_phone.charAt(0) != '+') {
+                        search_phone = "+84" + search_phone.substring(1);
+                    }
+                }
+                reference.child("Users").child(phone).child("friends").child(search_phone).setValue(null);
+                dialog.dismiss();
+            }
+        });
+        yes_add_friend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String search_phone = phone_number.getText().toString().trim();
+                if (search_phone.length() > 0) {
+                    if (search_phone.charAt(0) != '+') {
+                        search_phone = "+84" + search_phone.substring(1);
+                    }
+                }
+                if (search_phone.equals(phone)) {
+                    Toast.makeText(context, "You can't add yourself", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                reference.child("Users").child(phone).child("friends").child(search_phone).setValue(search_phone);
                 dialog.dismiss();
             }
         });
