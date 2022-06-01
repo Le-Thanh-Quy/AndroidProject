@@ -9,6 +9,7 @@ import android.os.Bundle;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.quy.chatapp.View.ChatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -37,5 +38,12 @@ public class MainActivity extends AppCompatActivity {
         }
         User.getInstance().setPhoneNumber(phone);
         System.out.println(User.getInstance().getPhoneNumber());
+
+
+        Intent intent = new Intent(MainActivity.this, ChatActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finishAndRemoveTask();
+        return;
     }
 }

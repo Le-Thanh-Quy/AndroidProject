@@ -7,7 +7,6 @@ public class Room {
     private String imageRoom;
     private String roomName;
     private String roomType;
-    private boolean seen;
 
     public Room() {
     }
@@ -19,7 +18,6 @@ public class Room {
         this.imageRoom = imageRoom;
         this.roomName = roomName;
         this.roomType = roomType;
-        this.seen = seen;
     }
 
     public String getRoomType() {
@@ -71,11 +69,4 @@ public class Room {
         this.roomName = roomName;
     }
 
-    public boolean isSeen() {
-        return seen;
-    }
-
-    public void setSeen(boolean seen) {
-        this.seen = seen;
-    }
 }
