@@ -68,14 +68,18 @@ public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.getValue() != null) {
                     String messId = snapshot.getValue(String.class);
+                    holder.layout_seen.setVisibility(View.INVISIBLE);
+                    holder.layout_seen_their.setVisibility(View.INVISIBLE);
                     holder.their_seen_me.setVisibility(View.INVISIBLE);
                     holder.their_seen_their.setVisibility(View.INVISIBLE);
                     if (mess.getTime().equals(messId)) {
                         if (myPhone.equals(mess.getUserId())) {
+                            holder.layout_seen.setVisibility(View.VISIBLE);
                             holder.their_seen_me.setVisibility(View.VISIBLE);
                             holder.their_seen_me.setImageBitmap(bitmapAvatar);
 
                         } else {
+                            holder.layout_seen_their.setVisibility(View.VISIBLE);
                             holder.their_seen_their.setVisibility(View.VISIBLE);
                             holder.their_seen_their.setImageBitmap(bitmapAvatar);
                         }
@@ -126,7 +130,7 @@ public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
         public RelativeLayout their_mess, my_mess;
         public ImageView their_avatar, their_seen_their, their_seen_me;
         public TextView their_name, their_mess_content, my_mess_content;
-        public CardView layout_avatar;
+        public CardView layout_avatar, layout_seen_their, layout_seen;
 
 
         public viewHolder(View view) {
@@ -140,6 +144,8 @@ public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
             their_mess_content = view.findViewById(R.id.their_mess_content);
             my_mess_content = view.findViewById(R.id.my_mess_content);
             layout_avatar = view.findViewById(R.id.layout_avatar);
+            layout_seen_their = view.findViewById(R.id.layout_seen_their);
+            layout_seen = view.findViewById(R.id.layout_seen);
         }
     }
 }

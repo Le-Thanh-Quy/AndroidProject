@@ -41,7 +41,7 @@
         android:maxLines="2"
         android:text="Lê Thanh Quý"
         android:textAlignment="center"
-        android:textColor="@color/black"
+        android:textColor="#494949"
         android:textFontWeight="500"
         android:textSize="16sp" />
 
@@ -50,11 +50,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/roomName"
-        android:maxWidth="150dp"
         android:layout_marginStart="10dp"
         android:layout_marginTop="7dp"
         android:layout_toEndOf="@+id/layoutAvatar"
         android:fontFamily="sans-serif-black"
+        android:maxWidth="150dp"
         android:maxLines="2"
         android:singleLine="true"
         android:text="Xin chào tất cả mọi người mình"

@@ -80,6 +80,10 @@ public class ChatsFragment extends Fragment {
                 listDataRoom.clear();
                 for(DataSnapshot dataSnapshot: snapshot.getChildren()) {
                     Room room = dataSnapshot.getValue(Room.class);
+                    assert room != null;
+                    if(room.getRoomType().equals("chat")) {
+                        room.setUserId(dataSnapshot.getKey());
+                    }
                     listDataRoom.add(room);
                 }
                 binding.loadFragment.setVisibility(View.GONE);
@@ -114,6 +118,9 @@ public class ChatsFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 listDataUser.clear();
+                User defaultUser = new User();
+                defaultUser.setUserName("Tạo tin");
+                listDataUser.add(defaultUser);
                 for(DataSnapshot dataSnapshot: snapshot.getChildren()) {
                     String userPhoneNumber = dataSnapshot.getValue(String.class);
                     assert userPhoneNumber != null;

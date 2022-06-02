@@ -41,6 +41,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -91,32 +92,29 @@ public class ChatActivity extends AppCompatActivity {
     User user;
     User theirUser;
     Room chat_room;
-    String sendPhone = "+84384933378";
     List<Mess> listData;
     ListChat listChat;
     Bitmap bitmapAvatar;
-
+    boolean isSeen;
+    boolean isOpenSeen;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityChatBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
-        this.overridePendingTransition(R.anim.animation_enter,
-                R.anim.animation_leave);
+        isSeen = true;
+        isOpenSeen = true;
+        this.overridePendingTransition(R.anim.animation_enter, R.anim.animation_leave);
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             theirUser = (User) bundle.getSerializable("other_user");
         }
         reference = FirebaseDatabase.getInstance().getReference();
         user = User.getInstance();
-        reference = FirebaseDatabase.getInstance().getReference();
-        user = User.getInstance();
         chat_room = new Room();
-        user.setUserName("Thanh Quý");
         listData = new ArrayList<>();
-        reference.child("Users").child(user.getPhoneNumber()).child("rooms").child(sendPhone).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+        reference.child("Users").child(user.getPhoneNumber()).child("rooms").child(theirUser.getPhoneNumber()).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
                 if (task.getResult().exists()) {
@@ -124,36 +122,81 @@ public class ChatActivity extends AppCompatActivity {
                     assert room != null;
                     chat_room.setRoomID(room.getRoomID());
                     chat_room.setRoomName(room.getRoomName());
-//                    eventChat();
                 } else {
                     isFirstMess = true;
                 }
                 uiEvent();
                 loadPage();
                 sendMess();
-
             }
         });
     }
 
     @Override
     public void finish() {
+        isSeen = false;
+        reference.removeEventListener(valueEventListener);
+        this.overridePendingTransition(0, 0);
         super.finish();
-        overridePendingTransition(0, 0);
+    }
+
+    @Override
+    public void onBackPressed() {
+        finishAndRemoveTask();
+        super.onBackPressed();
     }
 
     @Override
     protected void onPause() {
         reference.child("Users").child(user.getPhoneNumber()).child("status").setValue(false);
+        isSeen = false;
         super.onPause();
     }
 
     @Override
     protected void onResume() {
+        isSeen = true;
         reference.child("Users").child(user.getPhoneNumber()).child("status").setValue(true);
         super.onResume();
     }
 
+
+    private ValueEventListener valueEventListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(@NonNull DataSnapshot snapshot) {
+            if (isSeen) {
+                listData.clear();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    Mess mess = dataSnapshot.getValue(Mess.class);
+                    listData.add(mess);
+                }
+                if (listData.isEmpty()) {
+                    binding.progressBar.setVisibility(View.VISIBLE);
+                } else {
+                    reference.child("Rooms").child(chat_room.getRoomID()).child("listSeen").child(user.getPhoneNumber()).child("in").setValue(listData.get(listData.size() - 1).getTime());
+                    reference.child("Rooms").child(chat_room.getRoomID()).child("listSeen").child(user.getPhoneNumber()).child("is").setValue(true);
+                }
+                binding.progressBar.setVisibility(View.GONE);
+
+                listChat.notifyDataSetChanged();
+                if(!isOpenSeen) {
+                    if (listData.get(listData.size() - 1).getUserId().equals(user.getPhoneNumber())) {
+                        binding.listChat.scrollToPosition(listChat.getItemCount() - 1);
+                        binding.newMess.setVisibility(View.GONE);
+                    } else {
+                        binding.newMess.setVisibility(View.VISIBLE);
+                    }
+                }
+                isOpenSeen = false;
+
+            }
+        }
+
+        @Override
+        public void onCancelled(@NonNull DatabaseError error) {
+
+        }
+    };
 
     private void eventChat() {
         listChat = new ListChat(listData, ChatActivity.this, user.getPhoneNumber(), false, theirUser, chat_room.getRoomID(), bitmapAvatar);
@@ -164,31 +207,9 @@ public class ChatActivity extends AppCompatActivity {
         binding.listChat.setNestedScrollingEnabled(false);
         binding.listChat.setAdapter(listChat);
 
-        reference.child("Rooms").child(chat_room.getRoomID()).child("listMess").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                listData.clear();
-                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                    Mess mess = dataSnapshot.getValue(Mess.class);
-                    listData.add(mess);
-                }
-                if (listData.isEmpty()) {
-                    binding.progressBar.setVisibility(View.VISIBLE);
-                } else {
-                    binding.progressBar.setVisibility(View.GONE);
-                }
-                listChat.notifyDataSetChanged();
-                if (listData.get(listData.size() - 1).getUserId().equals(user.getPhoneNumber())) {
-                    binding.listChat.scrollToPosition(listChat.getItemCount() - 1);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
+        reference.child("Rooms").child(chat_room.getRoomID()).child("listMess").addValueEventListener(valueEventListener);
     }
+
 
     private void uiEvent() {
         binding.inputMessage.setOnFocusChangeListener(new View.OnFocusChangeListener() {
@@ -229,39 +250,69 @@ public class ChatActivity extends AppCompatActivity {
 
             }
         });
-    }
 
-    private void loadPage() {
-        reference.child("Users").child(sendPhone).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-            @SuppressLint("UseCompatLoadingForDrawables")
+        binding.listChat.setOnTouchListener(new View.OnTouchListener() {
+
             @Override
-            public void onComplete(@NonNull Task<DataSnapshot> task) {
-                User receive_user = task.getResult().getValue(User.class);
-                theirUser = receive_user;
-                assert receive_user != null;
-                binding.textName.setText(receive_user.getUserName());
-                if (!receive_user.getUserAvatar().equals("null")) {
-                    Picasso.get().load(receive_user.getUserAvatar()).fit().centerCrop().placeholder(ChatActivity.this.getResources().getDrawable(R.drawable.profile)).into(binding.avatar, new com.squareup.picasso.Callback() {
-                        @Override
-                        public void onSuccess() {
-                            BitmapDrawable drawable = (BitmapDrawable) binding.avatar.getDrawable();
-                            bitmapAvatar = drawable.getBitmap();
-                            eventChat();
-                        }
-
-                        @Override
-                        public void onError(Exception e) {
-
-                        }
-                    });
-                } else {
-                    BitmapDrawable drawable = (BitmapDrawable) binding.avatar.getDrawable();
-                    bitmapAvatar = drawable.getBitmap();
-                }
+            public boolean onTouch(View v, MotionEvent event) {
+                offKeyboard();
+                return false;
             }
         });
 
-        reference.child("Users").child(sendPhone).child("status").addValueEventListener(new ValueEventListener() {
+        binding.imageBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finishAndRemoveTask();
+            }
+        });
+        binding.newMess.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                binding.newMess.setVisibility(View.GONE);
+                binding.listChat.scrollToPosition(listChat.getItemCount() - 1);
+            }
+        });
+
+        binding.listChat.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if(!recyclerView.canScrollVertically(1)) {
+                    binding.newMess.setVisibility(View.GONE);
+                }
+            }
+        });
+    }
+
+
+    private int getCurrentItem() {
+        return ((LinearLayoutManager) binding.listChat.getLayoutManager())
+                .findFirstVisibleItemPosition();
+    }
+
+    private void loadPage() {
+        binding.textName.setText(theirUser.getUserName());
+        if (!theirUser.getUserAvatar().equals("null")) {
+            Picasso.get().load(theirUser.getUserAvatar()).fit().centerCrop().placeholder(ChatActivity.this.getResources().getDrawable(R.drawable.profile)).into(binding.avatar, new com.squareup.picasso.Callback() {
+                @Override
+                public void onSuccess() {
+                    BitmapDrawable drawable = (BitmapDrawable) binding.avatar.getDrawable();
+                    bitmapAvatar = drawable.getBitmap();
+                    eventChat();
+                }
+
+                @Override
+                public void onError(Exception e) {
+
+                }
+            });
+        } else {
+            BitmapDrawable drawable = (BitmapDrawable) binding.avatar.getDrawable();
+            bitmapAvatar = drawable.getBitmap();
+        }
+
+        reference.child("Users").child(theirUser.getPhoneNumber()).child("status").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.getValue() != null) {
@@ -309,12 +360,18 @@ public class ChatActivity extends AppCompatActivity {
                         reference.child("Rooms").child(room.getRoomID()).child("listMess").child(time_now).setValue(mess);
                         reference.child("Rooms").child(room.getRoomID()).child("listSeen").child(user.getPhoneNumber()).setValue(true);
                         reference.child("Rooms").child(room.getRoomID()).child("listSeen").child(theirUser.getPhoneNumber()).setValue(false);
+                        reference.child("Users").child(theirUser.getPhoneNumber()).child("rooms").child(user.getPhoneNumber()).child("roomTimeLastMess").setValue(time_now);
+                        reference.child("Users").child(user.getPhoneNumber()).child("rooms").child(theirUser.getPhoneNumber()).child("roomTimeLastMess").setValue(time_now);
+                        reference.child("Users").child(theirUser.getPhoneNumber()).child("rooms").child(user.getPhoneNumber()).child("lastMess").setValue(mess_content);
+                        reference.child("Users").child(user.getPhoneNumber()).child("rooms").child(theirUser.getPhoneNumber()).child("lastMess").setValue(mess_content);
                         isFirstMess = false;
                         chat_room.setRoomID(time_now);
                         eventChat();
                     } else {
-                        reference.child("Rooms").child(chat_room.getRoomID()).child("lastMess").setValue(mess_content);
-                        reference.child("Rooms").child(chat_room.getRoomID()).child("roomTimeLastMess").setValue(time_now);
+                        reference.child("Users").child(theirUser.getPhoneNumber()).child("rooms").child(user.getPhoneNumber()).child("roomTimeLastMess").setValue(time_now);
+                        reference.child("Users").child(user.getPhoneNumber()).child("rooms").child(theirUser.getPhoneNumber()).child("roomTimeLastMess").setValue(time_now);
+                        reference.child("Users").child(theirUser.getPhoneNumber()).child("rooms").child(user.getPhoneNumber()).child("lastMess").setValue(mess_content);
+                        reference.child("Users").child(user.getPhoneNumber()).child("rooms").child(theirUser.getPhoneNumber()).child("lastMess").setValue(mess_content);
                         reference.child("Rooms").child(chat_room.getRoomID()).child("listMess").child(time_now).setValue(mess);
                         reference.child("Rooms").child(chat_room.getRoomID()).child("listSeen").child(user.getPhoneNumber()).child("is").setValue(true);
                         reference.child("Rooms").child(chat_room.getRoomID()).child("listSeen").child(user.getPhoneNumber()).child("in").setValue(time_now);

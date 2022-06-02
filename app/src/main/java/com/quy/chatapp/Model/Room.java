@@ -7,18 +7,28 @@ public class Room {
     private String imageRoom;
     private String roomName;
     private String roomType;
+    private String userId;
 
 
     public Room() {
     }
 
-    public Room(String roomID, String lastMess, String roomTimeLastMess, String imageRoom, String roomName, String roomType) {
+    public Room(String roomID, String lastMess, String roomTimeLastMess, String imageRoom, String roomName, String roomType, String userId) {
         this.roomID = roomID;
         this.lastMess = lastMess;
         this.roomTimeLastMess = roomTimeLastMess;
         this.imageRoom = imageRoom;
         this.roomName = roomName;
         this.roomType = roomType;
+        this.userId = userId;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getRoomType() {

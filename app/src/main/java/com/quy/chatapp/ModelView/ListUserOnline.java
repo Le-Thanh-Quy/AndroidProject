@@ -1,6 +1,7 @@
 package com.quy.chatapp.ModelView;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.quy.chatapp.Model.User;
 import com.quy.chatapp.R;
+import com.quy.chatapp.View.ChatActivity;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -45,6 +47,12 @@ public class ListUserOnline extends RecyclerView.Adapter<ListUserOnline.viewHold
     public void onBindViewHolder(@NonNull viewHolder holder, int position) {
         int currentPosition = position;
         User user = listData.get(position);
+        if(user.getUserName().equals("Tạo tin")) {
+            holder.userName.setText(user.getUserName());
+            holder.userAvatar.setImageDrawable(context.getResources().getDrawable(R.drawable.add_satus));
+            holder.userStatus.setVisibility(View.GONE);
+            return;
+        }
         reference.child("Users").child(user.getPhoneNumber()).child("status").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -82,6 +90,15 @@ public class ListUserOnline extends RecyclerView.Adapter<ListUserOnline.viewHold
         } else {
             holder.userAvatar.setImageDrawable(context.getDrawable(R.drawable.profile));
         }
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(context, ChatActivity.class);
+                intent.putExtra("other_user", user);
+                context.startActivity(intent);
+            }
+        });
 
     }
 
