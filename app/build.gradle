@@ -33,6 +33,7 @@ android {
     buildToolsVersion '31.0.0'
     buildFeatures {
         viewBinding true
+
     }
 }
 
@@ -53,4 +54,8 @@ dependencies {
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation platform('com.google.firebase:firebase-bom:30.0.2')
     implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.intuit.sdp:sdp-android:1.0.6'
+    implementation 'com.intuit.ssp:ssp-android:1.0.6'
+    implementation 'com.makeramen:roundedimageview:2.3.0'
+    implementation 'com.squareup.picasso:picasso:2.71828'
 }

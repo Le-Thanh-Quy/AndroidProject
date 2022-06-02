@@ -42,24 +42,24 @@ public class ListRoom extends RecyclerView.Adapter<ListRoom.viewHolder> {
     public void onBindViewHolder(@NonNull viewHolder holder, int position) {
         Room room = listData.get(position);
 
-        holder.roomName.setText(room.getRoomName());
-        holder.roomLastMess.setText(room.getLastMess());
-        String time = room.getRoomTimeLastMess();
-        String[] arrTime = time.split(" ");
-        holder.roomTimeLastMess.setText("- " + arrTime[1] + " " + arrTime[2]);
-        if(room.getRoomType().equals("group")) {
-            holder.roomSeenStatus.setVisibility(View.INVISIBLE);
-            holder.roomStatus.setVisibility(View.INVISIBLE);
-        }
-        if (!"null".equals(room.getImageRoom())) {
-            Picasso.get().load(room.getImageRoom()).into(holder.roomImage);
-        }
-
-        if(!room.isSeen()) {
-            holder.roomLastMess.setTypeface(null, Typeface.BOLD);
-            holder.roomName.setTypeface(null, Typeface.BOLD);
-            holder.roomTimeLastMess.setTypeface(null, Typeface.BOLD);
-        }
+//        holder.roomName.setText(room.getRoomName());
+//        holder.roomLastMess.setText(room.getLastMess());
+//        String time = room.getRoomTimeLastMess();
+//        String[] arrTime = time.split(" ");
+//        holder.roomTimeLastMess.setText("- " + arrTime[1] + " " + arrTime[2]);
+//        if(room.getRoomType().equals("group")) {
+//            holder.roomSeenStatus.setVisibility(View.INVISIBLE);
+//            holder.roomStatus.setVisibility(View.INVISIBLE);
+//        }
+//        if (!"null".equals(room.getImageRoom())) {
+//            Picasso.get().load(room.getImageRoom()).into(holder.roomImage);
+//        }
+//
+//        if(!room.isSeen()) {
+//            holder.roomLastMess.setTypeface(null, Typeface.BOLD);
+//            holder.roomName.setTypeface(null, Typeface.BOLD);
+//            holder.roomTimeLastMess.setTypeface(null, Typeface.BOLD);
+//        }
     }
 
     @Override

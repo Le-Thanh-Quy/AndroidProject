@@ -7,21 +7,18 @@ public class Room {
     private String imageRoom;
     private String roomName;
     private String roomType;
-    private String phoneNumber;
-    private boolean seen;
+
 
     public Room() {
     }
 
-    public Room(String roomID, String lastMess, String roomTimeLastMess, String imageRoom, String roomName, String roomType, String phoneNumber, boolean seen) {
+    public Room(String roomID, String lastMess, String roomTimeLastMess, String imageRoom, String roomName, String roomType) {
         this.roomID = roomID;
         this.lastMess = lastMess;
         this.roomTimeLastMess = roomTimeLastMess;
         this.imageRoom = imageRoom;
         this.roomName = roomName;
         this.roomType = roomType;
-        this.phoneNumber = phoneNumber;
-        this.seen = seen;
     }
 
     public String getRoomType() {
@@ -73,19 +70,4 @@ public class Room {
         this.roomName = roomName;
     }
 
-    public boolean isSeen() {
-        return seen;
-    }
-
-    public void setSeen(boolean seen) {
-        this.seen = seen;
-    }
-
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
 }
