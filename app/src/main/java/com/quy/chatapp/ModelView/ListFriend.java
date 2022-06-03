@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -26,6 +27,7 @@ import com.quy.chatapp.View.ChatActivity;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class ListFriend extends RecyclerView.Adapter<ListFriend.viewHolder> {
 
@@ -54,9 +56,24 @@ public class ListFriend extends RecyclerView.Adapter<ListFriend.viewHolder> {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.getValue() != null) {
-                    if (!snapshot.getValue(Boolean.class)) {
+                    if (!snapshot.child("is").getValue(Boolean.class)) {
                         holder.friendStatus.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#979797")));
+                        String time = snapshot.child("in").getValue(String.class);;
+                        long lassMessTime = Long.parseLong(time);
+                        long hours = TimeUnit.MILLISECONDS.toHours(System.currentTimeMillis() - lassMessTime);
+                        long minutes = TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - lassMessTime);
+                        holder.timeStatus.setVisibility(View.VISIBLE);
+                        if (minutes == 0) {
+                            holder.time_status_tv.setText("Vừa mới");
+                        } else if (minutes < 60) {
+                            holder.time_status_tv.setText(minutes + " phút");
+                        } else if (hours < 24) {
+                            holder.time_status_tv.setText(hours + " giờ");
+                        }  else {
+                            holder.timeStatus.setVisibility(View.GONE);
+                        }
                     } else {
+                        holder.timeStatus.setVisibility(View.GONE);
                         holder.friendStatus.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#5FD364")));
                     }
                 }
@@ -88,6 +105,21 @@ public class ListFriend extends RecyclerView.Adapter<ListFriend.viewHolder> {
                 context.startActivity(intent);
             }
         });
+
+        holder.itemView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN)
+                {
+                    v.setBackgroundColor(Color.parseColor("#f0f0f0"));
+                }
+                if (event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL)
+                {
+                    v.setBackgroundColor(Color.TRANSPARENT);
+                }
+                return false;
+            }
+        });
     }
 
     @Override
@@ -97,14 +129,16 @@ public class ListFriend extends RecyclerView.Adapter<ListFriend.viewHolder> {
 
     public class viewHolder extends RecyclerView.ViewHolder {
         public ImageView friendAvatar;
-        public CardView friendStatus;
-        public TextView friendName;
+        public CardView friendStatus, timeStatus;
+        public TextView friendName, time_status_tv;
 
         public viewHolder(View view) {
             super(view);
             friendAvatar = view.findViewById(R.id.friendAvatar);
             friendStatus = view.findViewById(R.id.friendStatus);
             friendName = view.findViewById(R.id.friendName);
+            timeStatus = view.findViewById(R.id.timeStatus);
+            time_status_tv = view.findViewById(R.id.time_status_tv);
         }
     }
 }

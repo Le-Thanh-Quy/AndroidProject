@@ -8,12 +8,14 @@ public class Room {
     private String roomName;
     private String roomType;
     private String userId;
+    private String iconId;
+    private String lastMessId;
 
 
     public Room() {
     }
 
-    public Room(String roomID, String lastMess, String roomTimeLastMess, String imageRoom, String roomName, String roomType, String userId) {
+    public Room(String roomID, String lastMess, String roomTimeLastMess, String imageRoom, String roomName, String roomType, String userId, String iconId, String lastMessId) {
         this.roomID = roomID;
         this.lastMess = lastMess;
         this.roomTimeLastMess = roomTimeLastMess;
@@ -21,6 +23,24 @@ public class Room {
         this.roomName = roomName;
         this.roomType = roomType;
         this.userId = userId;
+        this.iconId = iconId;
+        this.lastMessId = lastMessId;
+    }
+
+    public String getLastMessId() {
+        return lastMessId;
+    }
+
+    public void setLastMessId(String lastMessId) {
+        this.lastMessId = lastMessId;
+    }
+
+    public String getIconId() {
+        return iconId;
+    }
+
+    public void setIconId(String iconId) {
+        this.iconId = iconId;
     }
 
     public String getUserId() {

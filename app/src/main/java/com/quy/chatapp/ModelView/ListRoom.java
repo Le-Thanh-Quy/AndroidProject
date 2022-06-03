@@ -3,11 +3,13 @@ package com.quy.chatapp.ModelView;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -63,7 +65,12 @@ public class ListRoom extends RecyclerView.Adapter<ListRoom.viewHolder> {
         Room room = listData.get(position);
 
         holder.roomName.setText(room.getRoomName());
-        holder.roomLastMess.setText(room.getLastMess());
+        if (user.getPhoneNumber().equals(room.getLastMessId())) {
+            holder.roomLastMess.setText("Bạn: " + room.getLastMess());
+        } else {
+            holder.roomLastMess.setText(room.getLastMess());
+        }
+
         String time = room.getRoomTimeLastMess();
         long lassMessTime = Long.parseLong(time);
         long hours = TimeUnit.MILLISECONDS.toHours(System.currentTimeMillis() - lassMessTime);
@@ -124,6 +131,7 @@ public class ListRoom extends RecyclerView.Adapter<ListRoom.viewHolder> {
 
                         }
                     });
+                    eventStatus(holder);
                 }
             }
         });
@@ -177,14 +185,62 @@ public class ListRoom extends RecyclerView.Adapter<ListRoom.viewHolder> {
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(other_user != null) {
+                if (other_user != null) {
                     Intent intent = new Intent(context, ChatActivity.class);
                     intent.putExtra("other_user", other_user);
                     context.startActivity(intent);
                 }
             }
         });
+        holder.itemView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    v.setBackgroundColor(Color.parseColor("#f0f0f0"));
+                }
+                if (event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL) {
+                    v.setBackgroundColor(Color.TRANSPARENT);
+                }
+                return false;
+            }
+        });
+    }
 
+    private void eventStatus(@NonNull viewHolder holder) {
+        reference.child("Users").child(other_user.getPhoneNumber()).child("status").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.getValue() != null) {
+                    Boolean isOnline = snapshot.child("is").getValue(Boolean.class);
+                    if (!isOnline) {
+                        holder.roomStatus.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#979797")));
+                        String time = snapshot.child("in").getValue(String.class);
+                        ;
+                        long lassMessTime = Long.parseLong(time);
+                        long hours = TimeUnit.MILLISECONDS.toHours(System.currentTimeMillis() - lassMessTime);
+                        long minutes = TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - lassMessTime);
+                        holder.timeStatus.setVisibility(View.VISIBLE);
+                        if (minutes == 0) {
+                            holder.time_status_tv.setText("Vừa mới");
+                        } else if (minutes < 60) {
+                            holder.time_status_tv.setText(minutes + " phút");
+                        } else if (hours < 24) {
+                            holder.time_status_tv.setText(hours + " giờ");
+                        } else {
+                            holder.timeStatus.setVisibility(View.GONE);
+                        }
+                    } else {
+                        holder.timeStatus.setVisibility(View.GONE);
+                        holder.roomStatus.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#5FD364")));
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     @Override
@@ -194,8 +250,8 @@ public class ListRoom extends RecyclerView.Adapter<ListRoom.viewHolder> {
 
     public class viewHolder extends RecyclerView.ViewHolder {
         public ImageView roomImage, roomSeenImage;
-        public CardView roomStatus, roomSeenStatus;
-        public TextView roomName;
+        public CardView roomStatus, roomSeenStatus, timeStatus;
+        public TextView roomName, time_status_tv;
         public TextView roomLastMess;
         public TextView roomTimeLastMess;
 
@@ -208,6 +264,8 @@ public class ListRoom extends RecyclerView.Adapter<ListRoom.viewHolder> {
             roomTimeLastMess = view.findViewById(R.id.roomTimeLastMess);
             roomSeenImage = view.findViewById(R.id.roomSeenImage);
             roomSeenStatus = view.findViewById(R.id.roomSeenStatus);
+            timeStatus = view.findViewById(R.id.timeStatus);
+            time_status_tv = view.findViewById(R.id.time_status_tv);
         }
     }
 }

@@ -7,7 +7,6 @@ public class User implements Serializable {
     public String userAvatar;
     public String userName;
     public String phoneNumber;
-    public boolean status;
     public String password;
 
     public static User getInstance() {
@@ -17,11 +16,10 @@ public class User implements Serializable {
         return  instance;
     }
 
-    public User(String userAvatar, String userName, String phoneNumber, boolean status, String password) {
+    public User(String userAvatar, String userName, String phoneNumber, String password) {
         this.userAvatar = userAvatar;
         this.userName = userName;
         this.phoneNumber = phoneNumber;
-        this.status = status;
         this.password = password;
     }
 
@@ -50,14 +48,6 @@ public class User implements Serializable {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
-    }
-
-    public boolean isStatus() {
-        return status;
-    }
-
-    public void setStatus(boolean status) {
-        this.status = status;
     }
 
     public String getPassword() {

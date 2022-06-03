@@ -183,13 +183,14 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        reference.child("Users").child(phone).child("status").setValue(false);
+        reference.child("Users").child(phone).child("status").child("is").setValue(false);
+        reference.child("Users").child(phone).child("status").child("in").setValue(String.valueOf(System.currentTimeMillis()));
         super.onPause();
     }
 
     @Override
     protected void onResume() {
-        reference.child("Users").child(phone).child("status").setValue(true);
+        reference.child("Users").child(phone).child("status").child("is").setValue(true);
         super.onResume();
     }
 

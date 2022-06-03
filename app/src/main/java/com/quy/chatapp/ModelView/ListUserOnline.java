@@ -2,7 +2,9 @@ package com.quy.chatapp.ModelView;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -47,6 +49,7 @@ public class ListUserOnline extends RecyclerView.Adapter<ListUserOnline.viewHold
     public void onBindViewHolder(@NonNull viewHolder holder, int position) {
         int currentPosition = position;
         User user = listData.get(position);
+
         if(user.getUserName().equals("Tạo tin")) {
             holder.userName.setText(user.getUserName());
             holder.userAvatar.setImageDrawable(context.getResources().getDrawable(R.drawable.add_satus));
@@ -57,7 +60,7 @@ public class ListUserOnline extends RecyclerView.Adapter<ListUserOnline.viewHold
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.getValue() != null) {
-                    if (!snapshot.getValue(Boolean.class)) {
+                    if (!snapshot.child("is").getValue(Boolean.class)) {
                         holder.itemView.setVisibility(View.GONE);
                         ViewGroup.LayoutParams params = holder.itemView.getLayoutParams();
                         params.height = 0;
@@ -97,6 +100,21 @@ public class ListUserOnline extends RecyclerView.Adapter<ListUserOnline.viewHold
                 Intent intent = new Intent(context, ChatActivity.class);
                 intent.putExtra("other_user", user);
                 context.startActivity(intent);
+            }
+        });
+
+        holder.itemView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN)
+                {
+                    v.setBackgroundColor(Color.parseColor("#f0f0f0"));
+                }
+                if (event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL)
+                {
+                    v.setBackgroundColor(Color.TRANSPARENT);
+                }
+                return false;
             }
         });
 

@@ -166,7 +166,6 @@ public class CompleteRegisterActivity extends AppCompatActivity {
                                             user.setPhoneNumber(phone);
                                             user.setPassword(password);
                                             user.setUserName(userName);
-                                            user.setStatus(true);
                                             user.setUserAvatar(uri.toString());
                                             reference.child("Users").child(phone).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
                                                 @Override
@@ -207,7 +206,6 @@ public class CompleteRegisterActivity extends AppCompatActivity {
                                             user.setPhoneNumber(phone);
                                             user.setPassword(password);
                                             user.setUserName(userName);
-                                            user.setStatus(true);
                                             user.setUserAvatar(uri.toString());
                                             reference.child("Users").child(phone).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
                                                 @Override
@@ -240,7 +238,6 @@ public class CompleteRegisterActivity extends AppCompatActivity {
                         user.setPhoneNumber(phone);
                         user.setPassword(password);
                         user.setUserName(userName);
-                        user.setStatus(true);
                         user.setUserAvatar("null");
 
                         reference.child("Users").child(phone).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {

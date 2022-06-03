@@ -12,8 +12,8 @@
 
         <androidx.cardview.widget.CardView
             android:id="@+id/layout_avatar"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:layout_alignBottom="@+id/layout_their_mess"
             android:layout_marginBottom="0dp"
             app:cardCornerRadius="100dp">
@@ -32,13 +32,13 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="2dp"
             android:layout_toEndOf="@+id/layout_avatar"
             android:fontFamily="sans-serif-black"
             android:paddingHorizontal="16dp"
             android:text="Le Thanh Quy"
             android:textColor="#4E4E4E"
-            android:textSize="19sp" />
+            android:textSize="17sp" />
 
         <LinearLayout
             android:id="@+id/layout_their_mess"
@@ -46,9 +46,9 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/their_name"
             android:layout_marginStart="10dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="2dp"
             android:layout_toEndOf="@+id/layout_avatar"
-            android:paddingBottom="10dp">
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/their_mess_content"
@@ -65,7 +65,15 @@
                 android:singleLine="false"
                 android:text="this is messenger"
                 android:textColor="#4E4E4E"
-                android:textSize="18sp" />
+                android:textSize="15sp" />
+            <ImageView
+                android:id="@+id/their_mess_icon"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:padding="10dp"
+                android:layout_gravity="start"
+                android:visibility="visible"
+                android:src="@drawable/like_mess_0" />
         </LinearLayout>
 
         <androidx.cardview.widget.CardView
@@ -96,32 +104,49 @@
         android:layout_height="wrap_content"
         android:visibility="visible">
 
-        <TextView
-            android:id="@+id/my_mess_content"
+        <LinearLayout
+            android:id="@+id/layout_my_mess"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="2dp"
             android:layout_marginEnd="5dp"
             android:layout_toStartOf="@+id/layout_seen"
-            android:background="@drawable/border_my_mess"
-            android:ellipsize="end"
-            android:fontFamily="sans-serif-black"
-            android:inputType="textMultiLine"
-            android:maxWidth="230dp"
-            android:maxLines="20"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="10dp"
-            android:singleLine="false"
-            android:text="this is messenger"
-            android:textColor="#FFFFFF"
-            android:textSize="18sp" />
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/my_mess_content"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/border_my_mess"
+                android:ellipsize="end"
+                android:fontFamily="sans-serif-black"
+                android:inputType="textMultiLine"
+                android:maxWidth="230dp"
+                android:maxLines="20"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="10dp"
+                android:singleLine="false"
+                android:text="this is messenger"
+                android:textColor="#FFFFFF"
+                android:textSize="15sp" />
+
+            <ImageView
+                android:id="@+id/mess_icon"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:padding="10dp"
+                android:layout_gravity="end"
+                android:visibility="visible"
+                android:src="@drawable/like_mess_0" />
+        </LinearLayout>
+
 
         <androidx.cardview.widget.CardView
             android:id="@+id/layout_seen"
             android:layout_width="15dp"
             android:layout_height="15dp"
-            android:layout_alignBottom="@+id/my_mess_content"
+            android:layout_alignBottom="@+id/layout_my_mess"
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="2dp"
             android:layout_marginBottom="0dp"
@@ -129,11 +154,23 @@
 
             <ImageView
                 android:id="@+id/their_seen_me"
-                android:visibility="invisible"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                android:src="@drawable/profile" />
+                android:src="@drawable/profile"
+                android:visibility="invisible" />
         </androidx.cardview.widget.CardView>
     </RelativeLayout>
+
+    <TextView
+        android:id="@+id/mess_notification"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-black"
+        android:paddingHorizontal="5dp"
+        android:paddingVertical="10dp"
+        android:text="Thông báo"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textSize="13sp" />
 </RelativeLayout>
