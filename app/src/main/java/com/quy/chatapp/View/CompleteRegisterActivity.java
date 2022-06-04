@@ -27,6 +27,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.quy.chatapp.Model.MyToast;
 import com.quy.chatapp.Model.User;
 import com.quy.chatapp.R;
 import com.quy.chatapp.databinding.ActivityCompleteRegisterBinding;
@@ -141,7 +142,7 @@ public class CompleteRegisterActivity extends AppCompatActivity {
             public void onClick(View view) {
                 String userName = binding.etUserName.getText().toString().trim();
                 if (userName.isEmpty()) {
-                    Toast.makeText(CompleteRegisterActivity.this, "What's your name??", Toast.LENGTH_SHORT).show();
+                    MyToast.show(CompleteRegisterActivity.this, "What's your name??", Toast.LENGTH_SHORT);
                 } else {
                     ProgressDialog progress = new ProgressDialog(CompleteRegisterActivity.this);
                     progress.setTitle("Loading");
@@ -174,14 +175,14 @@ public class CompleteRegisterActivity extends AppCompatActivity {
                                                         SharedPreferences.Editor editor = sharedPreferences.edit();
                                                         editor.putString("phoneNumber", phone);
                                                         editor.apply();
-                                                        Toast.makeText(CompleteRegisterActivity.this, "Welcome to Chatapp!", Toast.LENGTH_SHORT).show();
+                                                        MyToast.show(CompleteRegisterActivity.this, "Welcome to Chatapp!", Toast.LENGTH_SHORT);
                                                         Intent intent = new Intent(CompleteRegisterActivity.this, MainActivity.class);
                                                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                                         startActivity(intent);
                                                         progress.dismiss();
                                                     } else {
                                                         progress.dismiss();
-                                                        Toast.makeText(CompleteRegisterActivity.this, "Error", Toast.LENGTH_SHORT).show();
+                                                        MyToast.show(CompleteRegisterActivity.this, "Error", Toast.LENGTH_SHORT);
                                                     }
                                                 }
                                             });
@@ -189,7 +190,7 @@ public class CompleteRegisterActivity extends AppCompatActivity {
                                     });
                                 } else {
                                     progress.dismiss();
-                                    Toast.makeText(CompleteRegisterActivity.this, "Error", Toast.LENGTH_SHORT).show();
+                                    MyToast.show(CompleteRegisterActivity.this, "Error", Toast.LENGTH_SHORT);
                                 }
                             }
                         });
@@ -214,14 +215,14 @@ public class CompleteRegisterActivity extends AppCompatActivity {
                                                         SharedPreferences.Editor editor = sharedPreferences.edit();
                                                         editor.putString("phoneNumber", phone);
                                                         editor.apply();
-                                                        Toast.makeText(CompleteRegisterActivity.this, "Welcome to Chatapp!", Toast.LENGTH_SHORT).show();
+                                                        MyToast.show(CompleteRegisterActivity.this, "Welcome to Chatapp!", Toast.LENGTH_SHORT);
                                                         Intent intent = new Intent(CompleteRegisterActivity.this, MainActivity.class);
                                                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                                         startActivity(intent);
                                                         progress.dismiss();
                                                     } else {
                                                         progress.dismiss();
-                                                        Toast.makeText(CompleteRegisterActivity.this, "Error", Toast.LENGTH_SHORT).show();
+                                                        MyToast.show(CompleteRegisterActivity.this, "Error", Toast.LENGTH_SHORT);
                                                     }
                                                 }
                                             });
@@ -229,7 +230,7 @@ public class CompleteRegisterActivity extends AppCompatActivity {
                                     });
                                 } else {
                                     progress.dismiss();
-                                    Toast.makeText(CompleteRegisterActivity.this, "Error", Toast.LENGTH_SHORT).show();
+                                    MyToast.show(CompleteRegisterActivity.this, "Error", Toast.LENGTH_SHORT);
                                 }
                             }
                         });
@@ -247,14 +248,14 @@ public class CompleteRegisterActivity extends AppCompatActivity {
                                     SharedPreferences.Editor editor = sharedPreferences.edit();
                                     editor.putString("phoneNumber", phone);
                                     editor.apply();
-                                    Toast.makeText(CompleteRegisterActivity.this, "Welcome to Chatapp!", Toast.LENGTH_SHORT).show();
+                                    MyToast.show(CompleteRegisterActivity.this, "Welcome to Chatapp!", Toast.LENGTH_SHORT);
                                     Intent intent = new Intent(CompleteRegisterActivity.this, MainActivity.class);
                                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                     startActivity(intent);
                                     progress.dismiss();
                                 } else {
                                     progress.dismiss();
-                                    Toast.makeText(CompleteRegisterActivity.this, "Error", Toast.LENGTH_SHORT).show();
+                                    MyToast.show(CompleteRegisterActivity.this, "Error", Toast.LENGTH_SHORT);
                                 }
                             }
                         });

@@ -29,6 +29,7 @@ import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.quy.chatapp.Model.MyToast;
 import com.quy.chatapp.R;
 import com.quy.chatapp.databinding.ActivityLoginBinding;
 
@@ -103,7 +104,7 @@ public class LoginActivity extends AppCompatActivity {
                                 return;
                             }
                         }
-                        Toast.makeText(LoginActivity.this, "Incorrect phone number or password", Toast.LENGTH_SHORT).show();
+                        MyToast.show(LoginActivity.this, "Incorrect phone number or password",  Toast.LENGTH_SHORT);
                     }
                 });
             }
@@ -162,7 +163,7 @@ public class LoginActivity extends AppCompatActivity {
                                             .build();
                             PhoneAuthProvider.verifyPhoneNumber(options);
                         } else {
-                            Toast.makeText(LoginActivity.this, "Incorrect phone number", Toast.LENGTH_SHORT).show();
+                            MyToast.show(LoginActivity.this, "Incorrect phone number", Toast.LENGTH_SHORT);
                         }
                     }
                 });
@@ -190,7 +191,7 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         progress.dismiss();
-                        Toast.makeText(LoginActivity.this, "Change password successfully", Toast.LENGTH_SHORT).show();
+                        MyToast.show(LoginActivity.this, "Change password successfully", Toast.LENGTH_SHORT);
                         binding.closeForgotPass.setVisibility(View.GONE);
                     }
                 });
@@ -216,8 +217,8 @@ public class LoginActivity extends AppCompatActivity {
                             binding.verificationCode.setEnabled(false);
                         } else {
                             if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
-                                Toast.makeText(getApplicationContext(),
-                                        "Incorrect Verification Code", Toast.LENGTH_LONG).show();
+                                MyToast.show(getApplicationContext(),
+                                        "Incorrect Verification Code", Toast.LENGTH_LONG);
                             }
                         }
                     }

@@ -46,6 +46,7 @@ import com.google.firebase.storage.UploadTask;
 import com.quy.chatapp.Fragment.ChatsFragment;
 import com.quy.chatapp.Fragment.FriendFragment;
 import com.quy.chatapp.Fragment.GroupFragment;
+import com.quy.chatapp.Model.MyToast;
 import com.quy.chatapp.Model.User;
 import com.quy.chatapp.R;
 import com.quy.chatapp.Fragment.StatusFragment;
@@ -175,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
             onStop();
         } else {
             loadFragment(new ChatsFragment(MainActivity.this));
-            Toast.makeText(MainActivity.this, "Press again to exit", Toast.LENGTH_SHORT).show();
+            MyToast.show(MainActivity.this, "Press again to exit", Toast.LENGTH_SHORT);
             countBack++;
         }
         super.onBackPressed();
@@ -280,11 +281,11 @@ public class MainActivity extends AppCompatActivity {
                                                             public void onComplete(@NonNull Task<Void> task) {
                                                                 if (task.isSuccessful()) {
                                                                     edit_avatar.setVisibility(View.INVISIBLE);
-                                                                    Toast.makeText(MainActivity.this, "Change avatar successfully", Toast.LENGTH_SHORT).show();
+                                                                    MyToast.show(MainActivity.this, "Change avatar successfully", Toast.LENGTH_SHORT);
                                                                     progress.dismiss();
                                                                 } else {
                                                                     progress.dismiss();
-                                                                    Toast.makeText(MainActivity.this, "Error", Toast.LENGTH_SHORT).show();
+                                                                    MyToast.show(MainActivity.this, "Error", Toast.LENGTH_SHORT);
                                                                 }
                                                             }
                                                         });
@@ -292,7 +293,7 @@ public class MainActivity extends AppCompatActivity {
                                                 });
                                             } else {
                                                 progress.dismiss();
-                                                Toast.makeText(MainActivity.this, "Error", Toast.LENGTH_SHORT).show();
+                                                MyToast.show(MainActivity.this, "Error", Toast.LENGTH_SHORT);
                                             }
                                         }
                                     });
@@ -310,11 +311,11 @@ public class MainActivity extends AppCompatActivity {
                                                             public void onComplete(@NonNull Task<Void> task) {
                                                                 if (task.isSuccessful()) {
                                                                     edit_avatar.setVisibility(View.INVISIBLE);
-                                                                    Toast.makeText(MainActivity.this, "Change avatar successfully", Toast.LENGTH_SHORT).show();
+                                                                    MyToast.show(MainActivity.this, "Change avatar successfully", Toast.LENGTH_SHORT);
                                                                     progress.dismiss();
                                                                 } else {
                                                                     progress.dismiss();
-                                                                    Toast.makeText(MainActivity.this, "Error", Toast.LENGTH_SHORT).show();
+                                                                    MyToast.show(MainActivity.this, "Error", Toast.LENGTH_SHORT);
                                                                 }
                                                             }
                                                         });
@@ -322,7 +323,7 @@ public class MainActivity extends AppCompatActivity {
                                                 });
                                             } else {
                                                 progress.dismiss();
-                                                Toast.makeText(MainActivity.this, "Error", Toast.LENGTH_SHORT).show();
+                                                MyToast.show(MainActivity.this, "Error", Toast.LENGTH_SHORT);
                                             }
                                         }
                                     });
@@ -363,9 +364,9 @@ public class MainActivity extends AppCompatActivity {
                                 if (input.getText().toString().trim().equals(user.getPassword())) {
                                     reference.child("Users").child(phone).child("password").setValue(et_pass.getText().toString().trim());
                                     edit_pass.setVisibility(View.INVISIBLE);
-                                    Toast.makeText(MainActivity.this, "Change password successfully", Toast.LENGTH_SHORT).show();
+                                    MyToast.show(MainActivity.this, "Change password successfully", Toast.LENGTH_SHORT);
                                 } else {
-                                    Toast.makeText(MainActivity.this, "Incorrect password", Toast.LENGTH_SHORT).show();
+                                    MyToast.show(MainActivity.this, "Incorrect password", Toast.LENGTH_SHORT);
                                 }
                             }
                         })
@@ -387,7 +388,7 @@ public class MainActivity extends AppCompatActivity {
                                 reference.child("Users").child(phone).child("userName").setValue(et_name.getText().toString().trim());
                                 edit_name.setVisibility(View.INVISIBLE);
                                 user_name.setText(et_name.getText().toString().trim());
-                                Toast.makeText(MainActivity.this, "Change yor name successfully", Toast.LENGTH_SHORT).show();
+                                MyToast.show(MainActivity.this, "Change yor name successfully", Toast.LENGTH_SHORT);
                                 break;
 
                             case DialogInterface.BUTTON_NEGATIVE:

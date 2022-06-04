@@ -32,6 +32,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.quy.chatapp.Model.MyToast;
 import com.quy.chatapp.Model.User;
 import com.quy.chatapp.ModelView.ListFriend;
 import com.quy.chatapp.R;
@@ -217,7 +218,7 @@ public class FriendFragment extends Fragment {
                     }
                 }
                 if (search_phone.equals(phone)) {
-                    Toast.makeText(context, "You can't add yourself", Toast.LENGTH_SHORT).show();
+                    MyToast.show(context, "You can't add yourself", Toast.LENGTH_SHORT);
                     return;
                 }
                 reference.child("Users").child(phone).child("friends").child(search_phone).setValue(search_phone);

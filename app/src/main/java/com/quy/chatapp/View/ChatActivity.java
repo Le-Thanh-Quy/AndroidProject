@@ -42,6 +42,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.quy.chatapp.Model.Mess;
+import com.quy.chatapp.Model.MyToast;
 import com.quy.chatapp.Model.Room;
 import com.quy.chatapp.Model.User;
 import com.quy.chatapp.ModelView.ListChat;
@@ -305,7 +306,7 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (isFirstMess) {
-                    Toast.makeText(ChatActivity.this, "Bạn chưa tạo tin nhắn với người này", Toast.LENGTH_SHORT).show();
+                    MyToast.show(ChatActivity.this, "Bạn chưa tạo tin nhắn với người này", Toast.LENGTH_SHORT);
                 } else {
                     openUserInfo();
                 }

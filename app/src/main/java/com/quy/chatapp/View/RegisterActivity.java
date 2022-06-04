@@ -28,6 +28,7 @@ import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.quy.chatapp.Model.MyToast;
 import com.quy.chatapp.R;
 import com.quy.chatapp.databinding.ActivityRegisterBinding;
 
@@ -224,8 +225,8 @@ public class RegisterActivity extends AppCompatActivity {
                             imm.hideSoftInputFromWindow(RegisterActivity.this.getCurrentFocus().getWindowToken(), 0);
                         } else {
                             if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
-                                Toast.makeText(getApplicationContext(),
-                                        "Incorrect Verification Code", Toast.LENGTH_LONG).show();
+                                MyToast.show(getApplicationContext(),
+                                        "Incorrect Verification Code", Toast.LENGTH_LONG);
                             }
                         }
                     }
@@ -243,7 +244,7 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
                 if (task.getResult().exists()) {
-                    Toast.makeText(RegisterActivity.this, "Phone number already", Toast.LENGTH_SHORT).show();
+                    MyToast.show(RegisterActivity.this, "Phone number already", Toast.LENGTH_SHORT);
                 } else {
                     progress = new ProgressDialog(RegisterActivity.this);
                     progress.setTitle("Loading");
