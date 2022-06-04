@@ -10,6 +10,8 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
@@ -56,7 +58,39 @@ public class RegisterActivity extends AppCompatActivity {
         super.finish();
         overridePendingTransition(0, 0);
     }
+
+    boolean isShowPass = false;
+    boolean isShowRePass = false;
+
     private void addEvent() {
+        binding.hideShowPass.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (isShowPass) {
+                    binding.etPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                    binding.hideShowPass.setImageDrawable(getResources().getDrawable(R.drawable.show_pass));
+                } else {
+                    binding.etPassword.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                    binding.hideShowPass.setImageDrawable(getResources().getDrawable(R.drawable.hidden_pass));
+                }
+                binding.etPassword.setSelection(binding.etPassword.getText().length());
+                isShowPass = !isShowPass;
+            }
+        });
+        binding.hideShowRePass.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (isShowRePass) {
+                    binding.etRePassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                    binding.hideShowRePass.setImageDrawable(getResources().getDrawable(R.drawable.show_pass));
+                } else {
+                    binding.etRePassword.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                    binding.hideShowRePass.setImageDrawable(getResources().getDrawable(R.drawable.hidden_pass));
+                }
+                binding.etRePassword.setSelection(binding.etRePassword.getText().length());
+                isShowRePass = !isShowRePass;
+            }
+        });
         binding.goBackLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -186,7 +220,7 @@ public class RegisterActivity extends AppCompatActivity {
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(intent);
 
-                            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                             imm.hideSoftInputFromWindow(RegisterActivity.this.getCurrentFocus().getWindowToken(), 0);
                         } else {
                             if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
@@ -199,6 +233,7 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     String phone;
+
     private void sendVerificationCode() {
         phone = binding.etPhoneNumber.getText().toString();
         if (phone.charAt(0) != '+') {
@@ -207,7 +242,7 @@ public class RegisterActivity extends AppCompatActivity {
         database.child("Users").child(phone).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
-                if(task.getResult().exists()) {
+                if (task.getResult().exists()) {
                     Toast.makeText(RegisterActivity.this, "Phone number already", Toast.LENGTH_SHORT).show();
                 } else {
                     progress = new ProgressDialog(RegisterActivity.this);
@@ -227,6 +262,14 @@ public class RegisterActivity extends AppCompatActivity {
                                     .setCallbacks(mCallbacks)
                                     .build();
                     PhoneAuthProvider.verifyPhoneNumber(options);
+//                    PhoneAuthProvider.getInstance().verifyPhoneNumber
+//                            (
+//                                    phone,
+//                                    120,
+//                                    TimeUnit.SECONDS,
+//                                    RegisterActivity.this,
+//                                    mCallbacks
+//                            );
                 }
             }
         });
