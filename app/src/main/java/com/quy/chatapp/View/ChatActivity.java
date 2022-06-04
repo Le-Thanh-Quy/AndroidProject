@@ -332,7 +332,7 @@ public class ChatActivity extends AppCompatActivity {
         layout_icon = dialog.findViewById(R.id.layout_icon);
 
         et_name.setText(chat_room.getRoomName());
-        user_name.setText(chat_room.getRoomName());
+        user_name.setText(theirUser.getUserName());
         if (chat_room.getIconId() != null) {
             int idIcon = this.getResources().getIdentifier("like_mess_" + chat_room.getIconId(), "drawable", this.getPackageName());
             icon_chat.setImageResource(idIcon);
@@ -401,7 +401,6 @@ public class ChatActivity extends AppCompatActivity {
                 mess.setTime(time_now);
                 mess.setMessage("1__@__" + content);
                 reference.child("Rooms").child(chat_room.getRoomID()).child("listMess").child(time_now).setValue(mess);
-                user_name.setText(content);
                 binding.textName.setText(content);
                 edit_name.setVisibility(View.INVISIBLE);
             }
