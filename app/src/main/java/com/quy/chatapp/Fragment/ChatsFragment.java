@@ -25,6 +25,7 @@ import com.quy.chatapp.ModelView.ListRoom;
 import com.quy.chatapp.ModelView.ListUserOnline;
 import com.quy.chatapp.R;
 import com.quy.chatapp.databinding.FragmentChatsBinding;
+import com.quy.chatapp.databinding.FragmentFriendBinding;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,15 +34,21 @@ import java.util.List;
 
 public class ChatsFragment extends Fragment {
 
-    private DatabaseReference reference;
-    Context context;
-    FragmentChatsBinding binding;
-    String phone;
+    private static DatabaseReference reference;
+    private static Context context;
+    private FragmentChatsBinding binding;
+    private static String phone;
 
-    public ChatsFragment(Context context) {
-        this.context = context;
-        phone = User.getInstance().getPhoneNumber();
+    public ChatsFragment() {
+    }
+
+
+    public static ChatsFragment getInstance(Context context1) {
+        ChatsFragment instance = new ChatsFragment();
+        context = context1;
         reference = FirebaseDatabase.getInstance().getReference();
+        phone = User.getInstance().getPhoneNumber();
+        return instance;
     }
 
     @Override
@@ -52,7 +59,7 @@ public class ChatsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        binding = FragmentChatsBinding.inflate(inflater, container,false);
+        binding = FragmentChatsBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 
@@ -64,6 +71,7 @@ public class ChatsFragment extends Fragment {
 
     List<Room> listDataRoom;
     ListRoom listRoom;
+
     private void listRoomChatController() {
         listDataRoom = new ArrayList<Room>();
         listRoom = new ListRoom(listDataRoom, context);
@@ -78,16 +86,16 @@ public class ChatsFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 listDataRoom.clear();
-                for(DataSnapshot dataSnapshot: snapshot.getChildren()) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     Room room = dataSnapshot.getValue(Room.class);
                     assert room != null;
-                    if(room.getRoomType().equals("chat")) {
+                    if (room.getRoomType().equals("chat")) {
                         room.setUserId(dataSnapshot.getKey());
                     }
                     listDataRoom.add(room);
                 }
                 binding.loadFragment.setVisibility(View.GONE);
-                if(listDataRoom.isEmpty()) {
+                if (listDataRoom.isEmpty()) {
                     binding.notFound.setVisibility(View.VISIBLE);
                 } else {
                     binding.notFound.setVisibility(View.GONE);
@@ -104,6 +112,7 @@ public class ChatsFragment extends Fragment {
 
     List<User> listDataUser;
     ListUserOnline listUserOnline;
+
     private void listUserOnlineController() {
         listDataUser = new ArrayList<User>();
         listUserOnline = new ListUserOnline(listDataUser, context);
@@ -121,13 +130,13 @@ public class ChatsFragment extends Fragment {
                 User defaultUser = new User();
                 defaultUser.setUserName("Tạo tin");
                 listDataUser.add(defaultUser);
-                for(DataSnapshot dataSnapshot: snapshot.getChildren()) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     String userPhoneNumber = dataSnapshot.getValue(String.class);
                     assert userPhoneNumber != null;
                     reference.child("Users").child(userPhoneNumber).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                         @Override
                         public void onComplete(@NonNull Task<DataSnapshot> task) {
-                            if(task.getResult().getValue() != null) {
+                            if (task.getResult().getValue() != null) {
                                 User user = task.getResult().getValue(User.class);
                                 assert user != null;
                                 listDataUser.add(user);
@@ -138,6 +147,7 @@ public class ChatsFragment extends Fragment {
                 }
                 listUserOnline.notifyDataSetChanged();
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
             }

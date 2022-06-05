@@ -63,62 +63,37 @@ public class ListRoom extends RecyclerView.Adapter<ListRoom.viewHolder> {
     @Override
     public void onBindViewHolder(@NonNull viewHolder holder, int position) {
         Room room = listData.get(position);
-
-        holder.roomName.setText(room.getRoomName());
-        if (user.getPhoneNumber().equals(room.getLastMessId())) {
-            holder.roomLastMess.setText("Bạn: " + room.getLastMess());
-        } else {
-            holder.roomLastMess.setText(room.getLastMess());
-        }
-
-        String time = room.getRoomTimeLastMess();
-        long lassMessTime = Long.parseLong(time);
-        long hours = TimeUnit.MILLISECONDS.toHours(System.currentTimeMillis() - lassMessTime);
-        long minutes = TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - lassMessTime);
-        if (minutes == 0) {
-            holder.roomTimeLastMess.setText("Vừa xong");
-        } else if (minutes < 60) {
-            holder.roomTimeLastMess.setText(minutes + " phút trước");
-        } else if (hours < 24) {
-            holder.roomTimeLastMess.setText(hours + " giờ trước");
-        } else if (hours < 24 * 5 + 1) {
-            holder.roomTimeLastMess.setText(hours / 24 + " ngày trước");
-        } else {
-            SimpleDateFormat sdf = new SimpleDateFormat("MMM dd yyyy HH:mm");
-            Date resultDate = new Date(lassMessTime);
-            holder.roomTimeLastMess.setText(sdf.format(resultDate));
-        }
-
-        if (room.getRoomType().equals("group")) {
-            holder.roomSeenStatus.setVisibility(View.INVISIBLE);
-            holder.roomStatus.setVisibility(View.INVISIBLE);
-            if (!"null".equals(room.getImageRoom())) {
-                Picasso.get().load(room.getImageRoom()).fit().centerCrop().placeholder(context.getResources().getDrawable(R.drawable.profile)).into(holder.roomImage, new com.squareup.picasso.Callback() {
-                    @Override
-                    public void onSuccess() {
-                        BitmapDrawable drawable = (BitmapDrawable) holder.roomImage.getDrawable();
-                        Bitmap bitmapAvatar = drawable.getBitmap();
-                        holder.roomSeenImage.setImageBitmap(bitmapAvatar);
-                    }
-
-                    @Override
-                    public void onError(Exception e) {
-
-                    }
-                });
-
+        try {
+            holder.roomName.setText(room.getRoomName());
+            if (user.getPhoneNumber().equals(room.getLastMessId())) {
+                holder.roomLastMess.setText("Bạn: " + room.getLastMess());
+            } else {
+                holder.roomLastMess.setText(room.getLastMess());
             }
 
-            return;
-        }
+            String time = room.getRoomTimeLastMess();
+            long lassMessTime = Long.parseLong(time);
+            long hours = TimeUnit.MILLISECONDS.toHours(System.currentTimeMillis() - lassMessTime);
+            long minutes = TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - lassMessTime);
+            if (minutes == 0) {
+                holder.roomTimeLastMess.setText("Vừa xong");
+            } else if (minutes < 60) {
+                holder.roomTimeLastMess.setText(minutes + " phút trước");
+            } else if (hours < 24) {
+                holder.roomTimeLastMess.setText(hours + " giờ trước");
+            } else if (hours < 24 * 5 + 1) {
+                holder.roomTimeLastMess.setText(hours / 24 + " ngày trước");
+            } else {
+                SimpleDateFormat sdf = new SimpleDateFormat("MMM dd yyyy HH:mm");
+                Date resultDate = new Date(lassMessTime);
+                holder.roomTimeLastMess.setText(sdf.format(resultDate));
+            }
 
-
-        reference.child("Users").child(room.getUserId()).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DataSnapshot> task) {
-                if (task.getResult().getValue() != null) {
-                    other_user = task.getResult().getValue(User.class);
-                    Picasso.get().load(other_user.getUserAvatar()).fit().centerCrop().placeholder(context.getResources().getDrawable(R.drawable.profile)).into(holder.roomImage, new com.squareup.picasso.Callback() {
+            if (room.getRoomType().equals("group")) {
+                holder.roomSeenStatus.setVisibility(View.INVISIBLE);
+                holder.roomStatus.setVisibility(View.INVISIBLE);
+                if (!"null".equals(room.getImageRoom())) {
+                    Picasso.get().load(room.getImageRoom()).fit().centerCrop().placeholder(context.getResources().getDrawable(R.drawable.profile)).into(holder.roomImage, new com.squareup.picasso.Callback() {
                         @Override
                         public void onSuccess() {
                             BitmapDrawable drawable = (BitmapDrawable) holder.roomImage.getDrawable();
@@ -131,79 +106,108 @@ public class ListRoom extends RecyclerView.Adapter<ListRoom.viewHolder> {
 
                         }
                     });
-                    eventStatus(holder);
+
                 }
+
+                return;
             }
-        });
 
 
-        reference.child("Rooms").child(room.getRoomID()).child("listSeen").child(user.getPhoneNumber()).child("is").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.getValue() != null) {
-                    if (snapshot.getValue(Boolean.class)) {
-                        holder.roomLastMess.setTypeface(null, Typeface.NORMAL);
-                        holder.roomName.setTypeface(null, Typeface.NORMAL);
-                        holder.roomTimeLastMess.setTypeface(null, Typeface.NORMAL);
-                        holder.roomLastMess.setTextColor(Color.parseColor("#494949"));
-                        holder.roomName.setTextColor(Color.parseColor("#494949"));
-                    } else {
+            reference.child("Users").child(room.getUserId()).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DataSnapshot> task) {
+                    if (task.getResult().getValue() != null) {
+                        other_user = task.getResult().getValue(User.class);
+                        Picasso.get().load(other_user.getUserAvatar()).fit().centerCrop().placeholder(context.getResources().getDrawable(R.drawable.profile)).into(holder.roomImage, new com.squareup.picasso.Callback() {
+                            @Override
+                            public void onSuccess() {
+                                BitmapDrawable drawable = (BitmapDrawable) holder.roomImage.getDrawable();
+                                Bitmap bitmapAvatar = drawable.getBitmap();
+                                holder.roomSeenImage.setImageBitmap(bitmapAvatar);
+                            }
 
-                        holder.roomLastMess.setTypeface(null, Typeface.BOLD);
-                        holder.roomName.setTypeface(null, Typeface.BOLD);
-                        holder.roomTimeLastMess.setTypeface(null, Typeface.BOLD);
-                        holder.roomLastMess.setTextColor(Color.BLACK);
-                        holder.roomName.setTextColor(Color.BLACK);
+                            @Override
+                            public void onError(Exception e) {
+
+                            }
+                        });
+                        eventStatus(holder);
                     }
                 }
-            }
+            });
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
 
-            }
-        });
+            reference.child("Rooms").child(room.getRoomID()).child("listSeen").child(user.getPhoneNumber()).child("is").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.getValue() != null) {
+                        if (snapshot.getValue(Boolean.class)) {
+                            holder.roomLastMess.setTypeface(null, Typeface.NORMAL);
+                            holder.roomName.setTypeface(null, Typeface.NORMAL);
+                            holder.roomTimeLastMess.setTypeface(null, Typeface.NORMAL);
+                            holder.roomLastMess.setTextColor(Color.parseColor("#494949"));
+                            holder.roomName.setTextColor(Color.parseColor("#494949"));
+                        } else {
 
-        reference.child("Rooms").child(room.getRoomID()).child("listSeen").child(room.getUserId()).child("is").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.getValue() != null) {
-                    if (snapshot.getValue(Boolean.class)) {
-                        holder.roomSeenImage.setVisibility(View.VISIBLE);
-                    } else {
-                        holder.roomSeenImage.setVisibility(View.GONE);
+                            holder.roomLastMess.setTypeface(null, Typeface.BOLD);
+                            holder.roomName.setTypeface(null, Typeface.BOLD);
+                            holder.roomTimeLastMess.setTypeface(null, Typeface.BOLD);
+                            holder.roomLastMess.setTextColor(Color.BLACK);
+                            holder.roomName.setTextColor(Color.BLACK);
+                        }
                     }
                 }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
 
-            }
-        });
+                }
+            });
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (other_user != null) {
-                    Intent intent = new Intent(context, ChatActivity.class);
-                    intent.putExtra("other_user", other_user);
-                    context.startActivity(intent);
+            reference.child("Rooms").child(room.getRoomID()).child("listSeen").child(room.getUserId()).child("is").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.getValue() != null) {
+                        if (snapshot.getValue(Boolean.class)) {
+                            holder.roomSeenImage.setVisibility(View.VISIBLE);
+                        } else {
+                            holder.roomSeenImage.setVisibility(View.GONE);
+                        }
+                    }
                 }
-            }
-        });
-        holder.itemView.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    v.setBackgroundColor(Color.parseColor("#f0f0f0"));
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
                 }
-                if (event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL) {
-                    v.setBackgroundColor(Color.TRANSPARENT);
+            });
+
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (other_user != null) {
+                        Intent intent = new Intent(context, ChatActivity.class);
+                        intent.putExtra("other_user", other_user);
+                        context.startActivity(intent);
+                    }
                 }
-                return false;
-            }
-        });
+            });
+            holder.itemView.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                        v.setBackgroundColor(Color.parseColor("#f0f0f0"));
+                    }
+                    if (event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL) {
+                        v.setBackgroundColor(Color.TRANSPARENT);
+                    }
+                    return false;
+                }
+            });
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        }
+
     }
 
     private void eventStatus(@NonNull viewHolder holder) {

@@ -31,15 +31,20 @@ import java.util.List;
 
 public class GroupFragment extends Fragment {
 
-    private DatabaseReference reference;
-    Context context;
-    FragmentGroupBinding binding;
-    String phone;
+    private static DatabaseReference reference;
+    private static Context context;
+    private FragmentGroupBinding binding;
+    private static String phone;
 
-    public GroupFragment(Context context) {
-        this.context = context;
+    public GroupFragment() {
+    }
+
+    public static GroupFragment getInstance(Context context1) {
+        GroupFragment instance = new GroupFragment();
+        context = context1;
         reference = FirebaseDatabase.getInstance().getReference();
         phone = User.getInstance().getPhoneNumber();
+        return instance;
     }
 
     @Override
@@ -50,7 +55,7 @@ public class GroupFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        binding = FragmentGroupBinding.inflate(inflater, container,false);
+        binding = FragmentGroupBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 
@@ -60,7 +65,7 @@ public class GroupFragment extends Fragment {
     }
 
     List<Room> listData;
-    ListRoom listRoom ;
+    ListRoom listRoom;
 
     private void listFriendController() {
         listData = new ArrayList<Room>();
@@ -76,15 +81,15 @@ public class GroupFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 listData.clear();
-                for(DataSnapshot dataSnapshot: snapshot.getChildren()) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     Room room = dataSnapshot.getValue(Room.class);
                     assert room != null;
-                    if(room.getRoomType().equals("group")) {
+                    if (room.getRoomType().equals("group")) {
                         listData.add(room);
                     }
                 }
                 binding.loadFragment.setVisibility(View.GONE);
-                if(listData.isEmpty()) {
+                if (listData.isEmpty()) {
                     binding.notFound.setVisibility(View.VISIBLE);
                 } else {
                     binding.notFound.setVisibility(View.GONE);
