@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
         }
         User.getInstance().setPhoneNumber(phone);
         binding.navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
-        loadFragment(new ChatsFragment(MainActivity.this));
+        loadFragment(ChatsFragment.getInstance(MainActivity.this));
         reference = FirebaseDatabase.getInstance().getReference();
         firebaseStorage = FirebaseStorage.getInstance();
         loadData();
@@ -140,22 +140,22 @@ public class MainActivity extends AppCompatActivity {
             switch (item.getItemId()) {
                 case R.id.action_chats:
                     countBack = 0;
-                    fragment = new ChatsFragment(MainActivity.this);
+                    fragment = ChatsFragment.getInstance(MainActivity.this);
                     loadFragment(fragment);
                     return true;
                 case R.id.action_status:
                     countBack = 0;
-                    fragment = new StatusFragment();
+                    fragment = StatusFragment.getInstance(MainActivity.this);
                     loadFragment(fragment);
                     return true;
                 case R.id.action_friends:
                     countBack = 0;
-                    fragment = new FriendFragment(MainActivity.this);
+                    fragment = FriendFragment.getInstance(MainActivity.this);
                     loadFragment(fragment);
                     return true;
                 case R.id.action_group:
                     countBack = 0;
-                    fragment = new GroupFragment(MainActivity.this);
+                    fragment = GroupFragment.getInstance(MainActivity.this);
                     loadFragment(fragment);
                     return true;
             }
@@ -175,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
         if (countBack == 1) {
             onStop();
         } else {
-            loadFragment(new ChatsFragment(MainActivity.this));
+            loadFragment(ChatsFragment.getInstance(MainActivity.this));
             MyToast.show(MainActivity.this, "Press again to exit", Toast.LENGTH_SHORT);
             countBack++;
         }

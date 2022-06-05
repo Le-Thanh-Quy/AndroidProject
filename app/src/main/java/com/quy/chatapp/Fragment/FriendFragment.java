@@ -45,15 +45,20 @@ import java.util.List;
 
 public class FriendFragment extends Fragment {
 
-    private DatabaseReference reference;
-    Context context;
-    FragmentFriendBinding binding;
-    String phone;
+    public static DatabaseReference reference;
+    public static Context context;
+    public FragmentFriendBinding binding;
+    public static String phone;
 
-    public FriendFragment(Context context) {
-        this.context = context;
+    public FriendFragment() {
+    }
+
+    public static FriendFragment getInstance(Context context1) {
+        FriendFragment instance = new FriendFragment();
+        context = context1;
         reference = FirebaseDatabase.getInstance().getReference();
         phone = User.getInstance().getPhoneNumber();
+        return instance;
     }
 
 
@@ -103,7 +108,7 @@ public class FriendFragment extends Fragment {
                                 User user = task.getResult().getValue(User.class);
                                 assert user != null;
                                 listData.add(user);
-                                if(listData.isEmpty()) {
+                                if (listData.isEmpty()) {
                                     binding.notFound.setVisibility(View.VISIBLE);
                                 } else {
                                     binding.notFound.setVisibility(View.GONE);

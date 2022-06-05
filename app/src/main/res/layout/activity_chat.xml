@@ -176,12 +176,12 @@
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/chooseImageSend"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
             android:layout_marginStart="0dp"
-            android:padding="@dimen/_5sdp"
+            android:padding="12dp"
             android:scaleType="centerCrop"
             android:src="@drawable/add_photo" />
 
@@ -191,7 +191,7 @@
             android:layout_height="44dp"
             android:layout_alignParentBottom="true"
             android:layout_marginStart="5dp"
-            android:layout_marginEnd="10dp"
+            android:layout_marginEnd="5dp"
             android:layout_marginBottom="8dp"
             android:layout_toStartOf="@+id/layout_send"
             android:layout_toEndOf="@+id/chooseImageSend"
@@ -216,17 +216,18 @@
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/send_icon"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:padding="@dimen/_6sdp"
-                android:scaleType="fitXY"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:scaleType="centerCrop"
+                android:padding="12dp"
                 android:src="@drawable/like_mess_0" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/send_mess"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:padding="@dimen/_6sdp"
+                android:padding="12dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/send_mess"
                 android:tint="@color/primary"
@@ -246,38 +247,47 @@
         android:indeterminateTint="@color/black"
         android:indeterminateTintMode="src_atop"
         tools:ignore="MissingConstraints" />
+    <ImageView
+        android:id="@+id/not_found"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+        android:src="@drawable/conversation_person" />
 
     <RelativeLayout
         android:id="@+id/new_mess"
-        android:layout_width="200dp"
+        android:layout_width="210dp"
         android:layout_height="50dp"
         android:layout_below="@+id/layout_title"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
         android:visibility="gone"
-        android:background="@drawable/mess_notification">
+        android:background="@drawable/mess_notification"
+        android:backgroundTint="@color/app_color">
 
         <ImageView
             android:id="@+id/logo_notification"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:layout_marginStart="15dp"
-            android:layout_marginTop="12dp"
-            android:src="@drawable/new_mess" />
+            android:layout_marginStart="25dp"
+            android:layout_marginTop="8dp"
+            android:src="@drawable/new_mess"
+            app:tint="@color/white" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:layout_marginStart="5dp"
+            android:layout_alignParentEnd="true"
             android:layout_marginTop="8dp"
-            android:layout_toEndOf="@+id/logo_notification"
+            android:layout_marginEnd="20dp"
             android:fontFamily="sans-serif-black"
-            android:text="Có tin nhắn mới!"
+            android:text="Tin nhắn mới!"
             android:textAlignment="center"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             android:textSize="20sp" />
     </RelativeLayout>
 </RelativeLayout>

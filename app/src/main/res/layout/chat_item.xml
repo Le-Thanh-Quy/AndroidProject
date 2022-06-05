@@ -66,14 +66,35 @@
                 android:text="this is messenger"
                 android:textColor="#4E4E4E"
                 android:textSize="15sp" />
+
             <ImageView
                 android:id="@+id/their_mess_icon"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:padding="10dp"
                 android:layout_gravity="start"
-                android:visibility="visible"
-                android:src="@drawable/like_mess_0" />
+                android:padding="10dp"
+                android:src="@drawable/like_mess_0"
+                android:visibility="visible" />
+
+            <ImageView
+                android:id="@+id/their_mess_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="240dp"
+                android:minWidth="240dp"
+                android:layout_marginBottom="5dp"
+                android:scaleType="centerCrop"
+                android:layout_gravity="start"
+                android:adjustViewBounds="true"
+                android:background="#E1E1E1"
+                android:maxWidth="240dp" />
+
+            <ImageView
+                android:id="@+id/their_mess_video"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="start"
+                android:src="@drawable/video_mess"/>
         </LinearLayout>
 
         <androidx.cardview.widget.CardView
@@ -135,10 +156,29 @@
                 android:id="@+id/mess_icon"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:padding="10dp"
                 android:layout_gravity="end"
-                android:visibility="visible"
-                android:src="@drawable/like_mess_0" />
+                android:padding="10dp"
+                android:src="@drawable/like_mess_0"
+                android:visibility="visible" />
+
+            <ImageView
+                android:id="@+id/my_mess_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="240dp"
+                android:minHeight="240dp"
+                android:layout_gravity="end"
+                android:adjustViewBounds="true"
+                android:scaleType="centerCrop"
+                android:background="#E1E1E1"
+                android:maxWidth="240dp" />
+
+            <ImageView
+                android:id="@+id/my_mess_video"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="end"
+                android:src="@drawable/video_mess"/>
         </LinearLayout>
 
 
