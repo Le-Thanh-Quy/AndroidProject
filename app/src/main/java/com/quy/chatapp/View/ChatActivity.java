@@ -302,6 +302,22 @@ public class ChatActivity extends AppCompatActivity {
 
             }
         });
+
+        reference.child("Users").child(user.getPhoneNumber()).child("friends").child(theirUser.getPhoneNumber()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(!snapshot.exists()) {
+                    binding.layoutAddFriend.setVisibility(View.VISIBLE);
+                } else {
+                    binding.layoutAddFriend.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
 
@@ -427,6 +443,12 @@ public class ChatActivity extends AppCompatActivity {
                         dialog.dismiss();
                     }
                 });
+            }
+        });
+        binding.addFriend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                reference.child("Users").child(user.getPhoneNumber()).child("friends").child(theirUser.getPhoneNumber()).setValue(theirUser.getPhoneNumber());
             }
         });
     }

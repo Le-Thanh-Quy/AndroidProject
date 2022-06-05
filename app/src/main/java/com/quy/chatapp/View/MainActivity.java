@@ -15,6 +15,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -48,6 +49,7 @@ import com.quy.chatapp.Fragment.FriendFragment;
 import com.quy.chatapp.Fragment.GroupFragment;
 import com.quy.chatapp.Model.MyToast;
 import com.quy.chatapp.Model.User;
+import com.quy.chatapp.ModelView.ZoomableImageView;
 import com.quy.chatapp.R;
 import com.quy.chatapp.Fragment.StatusFragment;
 import com.quy.chatapp.databinding.ActivityMainBinding;
@@ -535,6 +537,31 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         });
+
+        user_avatar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showImage(user_avatar);
+            }
+        });
+    }
+
+    private void showImage(ImageView imageView) {
+        BitmapDrawable drawable = (BitmapDrawable) imageView.getDrawable();
+        Bitmap bitmap = drawable.getBitmap();
+        Dialog dialog_image = new Dialog(MainActivity.this, R.style.Dialogs);
+        dialog_image.setContentView(R.layout.view_imge);
+        ZoomableImageView mess_image = dialog_image.findViewById(R.id.mess_image);
+        ImageView back_to_mess = dialog_image.findViewById(R.id.back_to_mess);
+
+        mess_image.setImageBitmap(bitmap);
+        back_to_mess.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog_image.dismiss();
+            }
+        });
+        dialog_image.show();
     }
 
     Uri uri;

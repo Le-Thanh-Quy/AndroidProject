@@ -219,8 +219,8 @@
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_gravity="center"
-                android:scaleType="centerCrop"
                 android:padding="12dp"
+                android:scaleType="centerCrop"
                 android:src="@drawable/like_mess_0" />
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -247,13 +247,14 @@
         android:indeterminateTint="@color/black"
         android:indeterminateTintMode="src_atop"
         tools:ignore="MissingConstraints" />
+
     <ImageView
         android:id="@+id/not_found"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_centerInParent="true"
-        android:visibility="gone"
-        android:src="@drawable/conversation_person" />
+        android:src="@drawable/conversation_person"
+        android:visibility="gone" />
 
     <RelativeLayout
         android:id="@+id/new_mess"
@@ -262,9 +263,9 @@
         android:layout_below="@+id/layout_title"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
-        android:visibility="gone"
         android:background="@drawable/mess_notification"
-        android:backgroundTint="@color/app_color">
+        android:backgroundTint="@color/app_color"
+        android:visibility="gone">
 
         <ImageView
             android:id="@+id/logo_notification"
@@ -289,5 +290,40 @@
             android:textAlignment="center"
             android:textColor="@color/white"
             android:textSize="20sp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/layout_add_friend"
+        android:layout_width="230dp"
+        android:layout_height="55dp"
+        android:layout_below="@+id/layout_title"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:visibility="gone"
+        android:background="#E2F2FF">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="5dp"
+            android:layout_toStartOf="@+id/add_friend"
+            android:fontFamily="sans-serif-black"
+            android:text="Thêm người này"
+            android:textAlignment="center"
+            android:textColor="@color/app_color"
+            android:textSize="20sp" />
+
+        <ImageView
+            android:id="@+id/add_friend"
+            android:layout_width="25dp"
+            android:layout_height="20dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/add_user"
+            android:layout_marginEnd="20dp"
+            app:tint="@color/app_color" />
     </RelativeLayout>
 </RelativeLayout>
