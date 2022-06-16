@@ -41,6 +41,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -59,6 +60,7 @@ import java.io.ByteArrayOutputStream;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static String id_user = "";
     private DatabaseReference reference;
     FirebaseStorage firebaseStorage;
     StorageReference storageReference;
@@ -96,7 +98,31 @@ public class MainActivity extends AppCompatActivity {
         firebaseStorage = FirebaseStorage.getInstance();
         loadData();
         profileController();
+        getToken();
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+            if(bundle.getBoolean("isNotification")) {
+                User theirUser = (User) bundle.getSerializable("other_user");
+                Intent intent = new Intent(MainActivity.this, ChatActivity.class);
+                intent.putExtra("other_user", theirUser);
+                startActivity(intent);
+            }
+        }
+    }
 
+    private void getToken() {
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if (!task.isSuccessful()) {
+
+                            return;
+                        }
+                        String token = task.getResult();
+                        reference.child("Users").child(phone).child("token").setValue(token);
+                    }
+                });
     }
 
     private void loadData() {
