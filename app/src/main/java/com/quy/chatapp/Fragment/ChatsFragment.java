@@ -30,6 +30,7 @@ import com.quy.chatapp.databinding.FragmentFriendBinding;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class ChatsFragment extends Fragment {
@@ -81,19 +82,41 @@ public class ChatsFragment extends Fragment {
         addEventListenRoom();
     }
 
+
+    public static ArrayList<Room> sortedListByTime(List<Room> rooms) {
+        ArrayList<Room> sort = new ArrayList<>(rooms);
+        Collections.sort(sort, new Comparator<Room>() {
+                    public int compare(Room o1, Room o2) {
+                        return o2.getRoomTimeLastMess().compareTo(o1.getRoomTimeLastMess());
+                    }
+                }
+        );
+        return sort;
+    }
+
     private void addEventListenRoom() {
         reference.child("Users").child(phone).child("rooms").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                listDataRoom.clear();
+
+                ArrayList<Room> rooms = new ArrayList<>();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     Room room = dataSnapshot.getValue(Room.class);
                     assert room != null;
                     if (room.getRoomType().equals("chat")) {
                         room.setUserId(dataSnapshot.getKey());
                     }
-                    listDataRoom.add(room);
+                    rooms.add(room);
                 }
+                try {
+                    listDataRoom.clear();
+                    listDataRoom.addAll(sortedListByTime(rooms));
+                } catch (Exception e)
+                {
+                    System.out.println(e.toString());
+                }
+
+
                 binding.loadFragment.setVisibility(View.GONE);
                 if (listDataRoom.isEmpty()) {
                     binding.notFound.setVisibility(View.VISIBLE);

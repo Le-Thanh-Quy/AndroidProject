@@ -15,6 +15,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -61,6 +62,7 @@ import com.quy.chatapp.Model.Room;
 import com.quy.chatapp.Model.User;
 import com.quy.chatapp.ModelView.ListChat;
 import com.quy.chatapp.ModelView.ZoomableImageView;
+import com.quy.chatapp.Notification.SendNotification;
 import com.quy.chatapp.R;
 import com.quy.chatapp.databinding.ActivityChatBinding;
 import com.squareup.picasso.Picasso;
@@ -95,25 +97,50 @@ public class ChatActivity extends AppCompatActivity {
     boolean isOpenSeen;
     FirebaseStorage firebaseStorage;
     StorageReference storageReference;
+    boolean isNotification = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityChatBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        reference = FirebaseDatabase.getInstance().getReference();
+        firebaseStorage = FirebaseStorage.getInstance();
         isSeen = true;
         isOpenSeen = true;
         this.overridePendingTransition(R.anim.animation_enter, R.anim.animation_leave);
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             theirUser = (User) bundle.getSerializable("other_user");
+            isNotification = bundle.getBoolean("isNotification");
         }
+
         binding.sendIcon.setColorFilter(Color.parseColor("#192497"));
-        reference = FirebaseDatabase.getInstance().getReference();
-        firebaseStorage = FirebaseStorage.getInstance();
         user = User.getInstance();
+        if(user == null) {
+            SharedPreferences sharedPreferences;
+            sharedPreferences = this.getSharedPreferences("Database", Context.MODE_PRIVATE);
+            if (sharedPreferences != null) {
+                user.setPhoneNumber(sharedPreferences.getString("phoneNumber", "null"));
+                if (user.getPhoneNumber().equals("null")) {
+                    Intent intent = new Intent(ChatActivity.this, LoginActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finishAndRemoveTask();
+                    return;
+                }
+            } else {
+                Intent intent = new Intent(ChatActivity.this, LoginActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finishAndRemoveTask();
+                return;
+            }
+        }
         chat_room = new Room();
         listData = new ArrayList<>();
+
         reference.child("Users").child(user.getPhoneNumber()).child("rooms").child(theirUser.getPhoneNumber()).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
@@ -126,12 +153,14 @@ public class ChatActivity extends AppCompatActivity {
                     binding.notFound.setVisibility(View.VISIBLE);
                     isFirstMess = true;
                 }
+
                 uiEvent();
                 loadPage();
                 sendMessEvent();
                 sendIconEvent();
             }
         });
+
     }
 
     @Override
@@ -145,11 +174,18 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        if (isNotification) {
+            Intent intent = new Intent(ChatActivity.this, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+        }
+        MainActivity.id_user = "";
         finishAndRemoveTask();
     }
 
     @Override
     protected void onPause() {
+        MainActivity.id_user = "";
         reference.child("Users").child(user.getPhoneNumber()).child("status").child("is").setValue(false);
         reference.child("Users").child(user.getPhoneNumber()).child("status").child("in").setValue(String.valueOf(System.currentTimeMillis()));
         isSeen = false;
@@ -159,6 +195,7 @@ public class ChatActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
+        MainActivity.id_user = theirUser.phoneNumber;
         isSeen = true;
         reference.child("Users").child(user.getPhoneNumber()).child("status").child("is").setValue(true);
         super.onResume();
@@ -302,6 +339,22 @@ public class ChatActivity extends AppCompatActivity {
 
             }
         });
+
+        reference.child("Users").child(user.getPhoneNumber()).child("friends").child(theirUser.getPhoneNumber()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!snapshot.exists()) {
+                    binding.layoutAddFriend.setVisibility(View.VISIBLE);
+                } else {
+                    binding.layoutAddFriend.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
 
@@ -357,6 +410,12 @@ public class ChatActivity extends AppCompatActivity {
         binding.imageBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (isNotification) {
+                    Intent intent = new Intent(ChatActivity.this, MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                }
+                MainActivity.id_user = "";
                 finishAndRemoveTask();
             }
         });
@@ -427,6 +486,12 @@ public class ChatActivity extends AppCompatActivity {
                         dialog.dismiss();
                     }
                 });
+            }
+        });
+        binding.addFriend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                reference.child("Users").child(user.getPhoneNumber()).child("friends").child(theirUser.getPhoneNumber()).setValue(theirUser.getPhoneNumber());
             }
         });
     }
@@ -764,8 +829,10 @@ public class ChatActivity extends AppCompatActivity {
             eventChat();
         } else {
             if (isImage) {
+                SendNotification.send(ChatActivity.this, theirUser.getToken(), user.getUserName(), mess.getMessage(), user.getPhoneNumber(), mess.getType(), user.getUserAvatar());
                 nextMess(time_now, "Đã gửi một ảnh", mess);
             } else {
+                SendNotification.send(ChatActivity.this, theirUser.getToken(), user.getUserName(), "Đã gửi một video", user.getPhoneNumber(), mess.getType(), user.getUserAvatar());
                 nextMess(time_now, "Đã gửi một video", mess);
             }
 
@@ -818,6 +885,7 @@ public class ChatActivity extends AppCompatActivity {
             chat_room.setRoomID(time_now);
             eventChat();
         } else {
+            SendNotification.send(ChatActivity.this, theirUser.getToken(), user.getUserName(), "Đã gửi một biểu cảm", user.getPhoneNumber(), mess.getType(), user.getUserAvatar());
             nextMess(time_now, "Đã gửi một biểu cảm", mess);
         }
         offKeyboard();
@@ -860,6 +928,7 @@ public class ChatActivity extends AppCompatActivity {
             chat_room.setRoomID(time_now);
             eventChat();
         } else {
+            SendNotification.send(ChatActivity.this, theirUser.getToken(), user.getUserName(), mess_content, user.getPhoneNumber(), mess.getType(), user.getUserAvatar());
             nextMess(time_now, mess_content, mess);
         }
         binding.inputMessage.setText("");

@@ -15,6 +15,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -40,6 +41,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -48,6 +50,7 @@ import com.quy.chatapp.Fragment.FriendFragment;
 import com.quy.chatapp.Fragment.GroupFragment;
 import com.quy.chatapp.Model.MyToast;
 import com.quy.chatapp.Model.User;
+import com.quy.chatapp.ModelView.ZoomableImageView;
 import com.quy.chatapp.R;
 import com.quy.chatapp.Fragment.StatusFragment;
 import com.quy.chatapp.databinding.ActivityMainBinding;
@@ -57,6 +60,7 @@ import java.io.ByteArrayOutputStream;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static String id_user = "";
     private DatabaseReference reference;
     FirebaseStorage firebaseStorage;
     StorageReference storageReference;
@@ -94,7 +98,31 @@ public class MainActivity extends AppCompatActivity {
         firebaseStorage = FirebaseStorage.getInstance();
         loadData();
         profileController();
+        getToken();
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+            if(bundle.getBoolean("isNotification")) {
+                User theirUser = (User) bundle.getSerializable("other_user");
+                Intent intent = new Intent(MainActivity.this, ChatActivity.class);
+                intent.putExtra("other_user", theirUser);
+                startActivity(intent);
+            }
+        }
+    }
 
+    private void getToken() {
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if (!task.isSuccessful()) {
+
+                            return;
+                        }
+                        String token = task.getResult();
+                        reference.child("Users").child(phone).child("token").setValue(token);
+                    }
+                });
     }
 
     private void loadData() {
@@ -535,6 +563,31 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         });
+
+        user_avatar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showImage(user_avatar);
+            }
+        });
+    }
+
+    private void showImage(ImageView imageView) {
+        BitmapDrawable drawable = (BitmapDrawable) imageView.getDrawable();
+        Bitmap bitmap = drawable.getBitmap();
+        Dialog dialog_image = new Dialog(MainActivity.this, R.style.Dialogs);
+        dialog_image.setContentView(R.layout.view_imge);
+        ZoomableImageView mess_image = dialog_image.findViewById(R.id.mess_image);
+        ImageView back_to_mess = dialog_image.findViewById(R.id.back_to_mess);
+
+        mess_image.setImageBitmap(bitmap);
+        back_to_mess.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog_image.dismiss();
+            }
+        });
+        dialog_image.show();
     }
 
     Uri uri;

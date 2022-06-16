@@ -8,6 +8,7 @@ public class User implements Serializable {
     public String userName;
     public String phoneNumber;
     public String password;
+    public String token;
 
     public static User getInstance() {
         if(instance == null) {
@@ -16,14 +17,27 @@ public class User implements Serializable {
         return  instance;
     }
 
-    public User(String userAvatar, String userName, String phoneNumber, String password) {
+    public User(String userAvatar, String userName, String phoneNumber, String password, String token) {
         this.userAvatar = userAvatar;
         this.userName = userName;
         this.phoneNumber = phoneNumber;
         this.password = password;
+        this.token = token;
     }
 
     public User() {
+    }
+
+    public static void setInstance(User instance) {
+        User.instance = instance;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public String getUserAvatar() {

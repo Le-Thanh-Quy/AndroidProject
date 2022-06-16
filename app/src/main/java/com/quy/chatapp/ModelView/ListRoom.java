@@ -43,7 +43,6 @@ public class ListRoom extends RecyclerView.Adapter<ListRoom.viewHolder> {
     public Context context;
     private DatabaseReference reference;
     User user;
-    User other_user;
 
     public ListRoom(List<Room> listData, Context context) {
         this.listData = listData;
@@ -63,6 +62,7 @@ public class ListRoom extends RecyclerView.Adapter<ListRoom.viewHolder> {
     @Override
     public void onBindViewHolder(@NonNull viewHolder holder, int position) {
         Room room = listData.get(position);
+        final User[] other_user = {new User()};
         try {
             holder.roomName.setText(room.getRoomName());
             if (user.getPhoneNumber().equals(room.getLastMessId())) {
@@ -111,14 +111,12 @@ public class ListRoom extends RecyclerView.Adapter<ListRoom.viewHolder> {
 
                 return;
             }
-
-
             reference.child("Users").child(room.getUserId()).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<DataSnapshot> task) {
                     if (task.getResult().getValue() != null) {
-                        other_user = task.getResult().getValue(User.class);
-                        Picasso.get().load(other_user.getUserAvatar()).fit().centerCrop().placeholder(context.getResources().getDrawable(R.drawable.profile)).into(holder.roomImage, new com.squareup.picasso.Callback() {
+                        other_user[0] = task.getResult().getValue(User.class);
+                        Picasso.get().load(other_user[0].getUserAvatar()).fit().centerCrop().placeholder(context.getResources().getDrawable(R.drawable.profile)).into(holder.roomImage, new com.squareup.picasso.Callback() {
                             @Override
                             public void onSuccess() {
                                 BitmapDrawable drawable = (BitmapDrawable) holder.roomImage.getDrawable();
@@ -131,7 +129,7 @@ public class ListRoom extends RecyclerView.Adapter<ListRoom.viewHolder> {
 
                             }
                         });
-                        eventStatus(holder);
+                        eventStatus(holder, other_user[0]);
                     }
                 }
             });
@@ -185,9 +183,9 @@ public class ListRoom extends RecyclerView.Adapter<ListRoom.viewHolder> {
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (other_user != null) {
+                    if (other_user[0] != null) {
                         Intent intent = new Intent(context, ChatActivity.class);
-                        intent.putExtra("other_user", other_user);
+                        intent.putExtra("other_user", other_user[0]);
                         context.startActivity(intent);
                     }
                 }
@@ -210,7 +208,7 @@ public class ListRoom extends RecyclerView.Adapter<ListRoom.viewHolder> {
 
     }
 
-    private void eventStatus(@NonNull viewHolder holder) {
+    private void eventStatus(@NonNull viewHolder holder, User other_user) {
         reference.child("Users").child(other_user.getPhoneNumber()).child("status").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {

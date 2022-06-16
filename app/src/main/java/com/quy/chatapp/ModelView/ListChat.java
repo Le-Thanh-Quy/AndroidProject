@@ -1,7 +1,11 @@
 package com.quy.chatapp.ModelView;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
@@ -9,6 +13,7 @@ import android.media.MediaPlayer;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -16,6 +21,7 @@ import android.widget.MediaController;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
@@ -28,13 +34,18 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.quy.chatapp.Model.Mess;
+import com.quy.chatapp.Model.MyToast;
 import com.quy.chatapp.Model.User;
+import com.quy.chatapp.Notification.SendNotification;
 import com.quy.chatapp.R;
 import com.quy.chatapp.View.ChatActivity;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
 
@@ -80,9 +91,77 @@ public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
         holder.their_mess_content.setVisibility(View.GONE);
         holder.my_mess_video.setVisibility(View.GONE);
         holder.their_mess_video.setVisibility(View.GONE);
-
         holder.their_avatar.setImageBitmap(bitmapAvatar);
 
+        holder.my_mess.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        switch (which) {
+                            case DialogInterface.BUTTON_POSITIVE:
+                                reference.child("Rooms").child(roomID).child("listMess").child(mess.getTime()).child("type").setValue("delete");
+                                SendNotification.send(context, theirUser.getToken(), User.getInstance().getUserName(), "Đã thu hồi một tin nhắn", myPhone, "delete", User.getInstance().getUserAvatar());
+                                break;
+
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                //No button clicked
+                                break;
+                        }
+                    }
+                };
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setMessage("Are you sure you want to delete?").setPositiveButton("Yes", dialogClickListener)
+                        .setNegativeButton("No", dialogClickListener).show();
+                return false;
+            }
+        });
+
+
+        String time = mess.getTime();
+
+
+        holder.my_mess.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (holder.my_mess_time.getVisibility() == View.GONE) {
+                    getTiemMess(time, holder);
+                    holder.my_mess_time.setVisibility(View.VISIBLE);
+                    holder.my_mess_time.setScaleY(0);
+                    ;
+                    holder.my_mess_time.animate()
+                            .setDuration(300)
+                            .scaleYBy(0)
+                            .scaleY(1)
+                            .setListener(null);
+                } else {
+                    holder.my_mess_time.setVisibility(View.GONE);
+                }
+
+            }
+        });
+
+        holder.their_mess.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (holder.their_mess_time.getVisibility() == View.GONE) {
+                    getTiemMess(time, holder);
+                    holder.their_mess_time.setVisibility(View.VISIBLE);
+                    holder.their_mess_time.setScaleY(0);
+                    ;
+                    holder.their_mess_time.animate()
+                            .setDuration(300)
+                            .scaleYBy(0)
+                            .scaleY(1)
+                            .setListener(null);
+                } else {
+                    holder.their_mess_time.setVisibility(View.GONE);
+                }
+
+            }
+        });
 
         if (!isGroup) {
             holder.their_name.setVisibility(View.GONE);
@@ -117,6 +196,7 @@ public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
 
             }
         });
+
 
         // notification
         if (mess.getType().equals("notification")) {
@@ -234,6 +314,31 @@ public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
                     showVideo(mess.getMessage());
                 }
             });
+            return;
+        }
+
+        // deelete
+        if (mess.getType().equals("delete")) {
+            if (mess.getUserId().equals(myPhone)) {
+                holder.my_mess.setVisibility(View.VISIBLE);
+                holder.my_mess_content.setVisibility(View.VISIBLE);
+                holder.my_mess_content.setText("Tin nhắn đã bị thu hồi");
+                holder.my_mess_content.setTextColor(Color.BLACK);
+                holder.my_mess_content.setBackgroundResource(R.drawable.border_mess_remove);
+            } else {
+                if ((position + 1) < listData.size()) {
+                    if (!listData.get(position + 1).getUserId().equals(myPhone)) {
+                        holder.layout_avatar.setVisibility(View.INVISIBLE);
+                    } else {
+                        holder.layout_avatar.setVisibility(View.VISIBLE);
+                    }
+                }
+                holder.their_mess.setVisibility(View.VISIBLE);
+                holder.their_mess_content.setVisibility(View.VISIBLE);
+                holder.their_mess_content.setText("Tin nhắn đã bị thu hồi");
+                holder.their_mess_content.setTextColor(Color.BLACK);
+                holder.their_mess_content.setBackgroundResource(R.drawable.border_mess_remove);
+            }
             return;
         }
 
@@ -356,6 +461,30 @@ public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
         }
     }
 
+    private void getTiemMess(String time, viewHolder holder) {
+        long lassMessTime = Long.parseLong(time);
+        long hours = TimeUnit.MILLISECONDS.toHours(System.currentTimeMillis() - lassMessTime);
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - lassMessTime);
+        if (minutes == 0) {
+            holder.my_mess_time.setText("Vừa xong");
+            holder.their_mess_time.setText("Vừa xong");
+        } else if (minutes < 60) {
+            holder.my_mess_time.setText(minutes + " phút trước");
+            holder.their_mess_time.setText(minutes + " phút trước");
+        } else if (hours < 24) {
+            holder.my_mess_time.setText(hours + " giờ trước");
+            holder.their_mess_time.setText(hours + " giờ trước");
+        } else if (hours < 24 * 5 + 1) {
+            holder.my_mess_time.setText(hours / 24 + " ngày trước");
+            holder.their_mess_time.setText(hours / 24 + " ngày trước");
+        } else {
+            SimpleDateFormat sdf = new SimpleDateFormat("MMM dd yyyy HH:mm");
+            Date resultDate = new Date(lassMessTime);
+            holder.my_mess_time.setText(sdf.format(resultDate));
+            holder.their_mess_time.setText(sdf.format(resultDate));
+        }
+    }
+
     private void showImage(ImageView imageView) {
         BitmapDrawable drawable = (BitmapDrawable) imageView.getDrawable();
         Bitmap bitmap = drawable.getBitmap();
@@ -435,7 +564,7 @@ public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
                 their_mess_icon,
                 their_mess_image,
                 my_mess_image;
-        public TextView their_name, their_mess_content, my_mess_content, mess_notification;
+        public TextView their_name, their_mess_content, my_mess_content, mess_notification, my_mess_time, their_mess_time;
         public CardView layout_avatar, layout_seen_their, layout_seen;
         public ImageView my_mess_video, their_mess_video;
 
@@ -459,6 +588,8 @@ public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
             my_mess_image = view.findViewById(R.id.my_mess_image);
             my_mess_video = view.findViewById(R.id.my_mess_video);
             their_mess_video = view.findViewById(R.id.their_mess_video);
+            my_mess_time = view.findViewById(R.id.my_mess_time);
+            their_mess_time = view.findViewById(R.id.their_mess_time);
         }
     }
 }
