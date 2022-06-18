@@ -17,6 +17,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -29,6 +30,7 @@ import com.quy.chatapp.Model.User;
 import com.quy.chatapp.R;
 import com.quy.chatapp.View.ChatActivity;
 import com.quy.chatapp.View.MainActivity;
+
 
 import java.io.IOException;
 import java.io.InputStream;

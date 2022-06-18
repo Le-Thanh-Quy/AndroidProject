@@ -68,6 +68,7 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/border_their_mess"
                 android:ellipsize="end"
+                android:drawablePadding="10dp"
                 android:fontFamily="sans-serif-black"
                 android:inputType="textMultiLine"
                 android:maxWidth="230dp"
@@ -105,8 +106,8 @@
 
             <ImageView
                 android:id="@+id/their_mess_video"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
                 android:layout_gravity="start"
                 android:src="@drawable/video_mess" />
         </LinearLayout>
@@ -156,19 +157,20 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/border_my_mess"
+                android:clickable="true"
                 android:ellipsize="end"
+                android:drawablePadding="10dp"
+                android:focusable="true"
                 android:fontFamily="sans-serif-black"
                 android:inputType="textMultiLine"
                 android:maxWidth="230dp"
                 android:maxLines="20"
                 android:paddingHorizontal="16dp"
-                android:clickable="true"
                 android:paddingVertical="10dp"
                 android:singleLine="false"
                 android:text="this is messenger"
                 android:textColor="#FFFFFF"
-                android:textSize="15sp"
-                android:focusable="true" />
+                android:textSize="15sp" />
 
             <ImageView
                 android:id="@+id/mess_icon"
@@ -183,20 +185,20 @@
                 android:id="@+id/my_mess_image"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minWidth="240dp"
-                android:minHeight="240dp"
                 android:layout_gravity="end"
                 android:adjustViewBounds="true"
-                android:scaleType="centerCrop"
                 android:background="#E1E1E1"
-                android:maxWidth="240dp" />
+                android:maxWidth="240dp"
+                android:minWidth="240dp"
+                android:minHeight="240dp"
+                android:scaleType="centerCrop" />
 
             <ImageView
                 android:id="@+id/my_mess_video"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
                 android:layout_gravity="end"
-                android:src="@drawable/video_mess"/>
+                android:src="@drawable/video_mess" />
         </LinearLayout>
 
         <TextView
@@ -241,4 +243,5 @@
         android:textAlignment="center"
         android:textColor="@color/black"
         android:textSize="13sp" />
+
 </RelativeLayout>

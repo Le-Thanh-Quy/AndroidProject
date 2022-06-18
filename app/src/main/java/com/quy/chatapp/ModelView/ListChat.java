@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -92,33 +93,6 @@ public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
         holder.my_mess_video.setVisibility(View.GONE);
         holder.their_mess_video.setVisibility(View.GONE);
         holder.their_avatar.setImageBitmap(bitmapAvatar);
-
-        holder.my_mess.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case DialogInterface.BUTTON_POSITIVE:
-                                reference.child("Rooms").child(roomID).child("listMess").child(mess.getTime()).child("type").setValue("delete");
-                                SendNotification.send(context, theirUser.getToken(), User.getInstance().getUserName(), "Đã thu hồi một tin nhắn", myPhone, "delete", User.getInstance().getUserAvatar());
-                                break;
-
-                            case DialogInterface.BUTTON_NEGATIVE:
-                                //No button clicked
-                                break;
-                        }
-                    }
-                };
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setMessage("Are you sure you want to delete?").setPositiveButton("Yes", dialogClickListener)
-                        .setNegativeButton("No", dialogClickListener).show();
-                return false;
-            }
-        });
-
 
         String time = mess.getTime();
 
@@ -243,6 +217,15 @@ public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
                 }
                 holder.their_mess_icon.setImageResource(idIcon);
             }
+
+            holder.mess_icon.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    deleteMess(mess);
+                    return false;
+                }
+            });
+
             return;
         }
 
@@ -277,6 +260,14 @@ public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
                 @Override
                 public void onClick(View view) {
                     showImage(holder.their_mess_image);
+                }
+            });
+
+            holder.my_mess_image.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    deleteMess(mess);
+                    return false;
                 }
             });
             return;
@@ -314,6 +305,14 @@ public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
                     showVideo(mess.getMessage());
                 }
             });
+
+            holder.my_mess_video.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    deleteMess(mess);
+                    return false;
+                }
+            });
             return;
         }
 
@@ -323,7 +322,7 @@ public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
                 holder.my_mess.setVisibility(View.VISIBLE);
                 holder.my_mess_content.setVisibility(View.VISIBLE);
                 holder.my_mess_content.setText("Tin nhắn đã bị thu hồi");
-                holder.my_mess_content.setTextColor(Color.BLACK);
+                holder.my_mess_content.setTextColor(Color.parseColor("#FFCDCDCD"));
                 holder.my_mess_content.setBackgroundResource(R.drawable.border_mess_remove);
             } else {
                 if ((position + 1) < listData.size()) {
@@ -336,17 +335,60 @@ public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
                 holder.their_mess.setVisibility(View.VISIBLE);
                 holder.their_mess_content.setVisibility(View.VISIBLE);
                 holder.their_mess_content.setText("Tin nhắn đã bị thu hồi");
-                holder.their_mess_content.setTextColor(Color.BLACK);
+                holder.their_mess_content.setTextColor(Color.parseColor("#FFCDCDCD"));
                 holder.their_mess_content.setBackgroundResource(R.drawable.border_mess_remove);
             }
             return;
         }
 
+        // call
+        if (mess.getType().equals("call")) {
+            boolean isCall = false;
+            if (mess.getMessage().contains(":")) {
+                isCall = true;
+            }
+            Drawable img = context.getResources().getDrawable(R.drawable.ic_call);
+            if (isCall) {
+                img.setTint(Color.BLUE);
+            } else {
+                img.setTint(Color.RED);
+            }
+            if (mess.getUserId().equals(myPhone)) {
+                holder.my_mess.setVisibility(View.VISIBLE);
+                holder.my_mess_content.setVisibility(View.VISIBLE);
+                holder.my_mess_content.setText(mess.getMessage());
+                holder.my_mess_content.setTextColor(Color.BLACK);
+                holder.my_mess_content.setBackgroundResource(R.drawable.border_their_mess);
+                holder.my_mess_content.setCompoundDrawablesWithIntrinsicBounds(img, null, null, null);
+            } else {
+                if ((position + 1) < listData.size()) {
+                    if (!listData.get(position + 1).getUserId().equals(myPhone)) {
+                        holder.layout_avatar.setVisibility(View.INVISIBLE);
+                    } else {
+                        holder.layout_avatar.setVisibility(View.VISIBLE);
+                    }
+                }
+                holder.their_mess.setVisibility(View.VISIBLE);
+                holder.their_mess_content.setVisibility(View.VISIBLE);
+                holder.their_mess_content.setText(mess.getMessage());
+                holder.their_mess_content.setTextColor(Color.BLACK);
+                holder.their_mess_content.setBackgroundResource(R.drawable.border_their_mess);
+                holder.their_mess_content.setCompoundDrawablesWithIntrinsicBounds(img, null, null, null);
+            }
+            return;
+        }
 
         if (myPhone.equals(mess.getUserId())) {
             holder.my_mess.setVisibility(View.VISIBLE);
             holder.my_mess_content.setVisibility(View.VISIBLE);
             holder.my_mess_content.setText(mess.getMessage());
+            holder.my_mess_content.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View view) {
+                    deleteMess(mess);
+                    return false;
+                }
+            });
 
             // UI
 
@@ -543,6 +585,28 @@ public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
             }
         });
         dialog_image.show();
+    }
+
+    private void deleteMess(Mess mess) {
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which) {
+                    case DialogInterface.BUTTON_POSITIVE:
+                        reference.child("Rooms").child(roomID).child("listMess").child(mess.getTime()).child("type").setValue("delete");
+                        SendNotification.send(context, theirUser.getToken(), User.getInstance().getUserName(), "Đã thu hồi một tin nhắn", myPhone, "delete", User.getInstance().getUserAvatar());
+                        break;
+
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        //No button clicked
+                        break;
+                }
+            }
+        };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setMessage("Are you sure you want to delete?").setPositiveButton("Yes", dialogClickListener)
+                .setNegativeButton("No", dialogClickListener).show();
     }
 
     @Override
