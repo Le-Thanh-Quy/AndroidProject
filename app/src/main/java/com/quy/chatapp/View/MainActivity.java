@@ -4,9 +4,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -14,8 +17,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -51,16 +56,27 @@ import com.quy.chatapp.Fragment.GroupFragment;
 import com.quy.chatapp.Model.MyToast;
 import com.quy.chatapp.Model.User;
 import com.quy.chatapp.ModelView.ZoomableImageView;
+import com.quy.chatapp.Notification.PushVoiceCall;
 import com.quy.chatapp.R;
 import com.quy.chatapp.Fragment.StatusFragment;
 import com.quy.chatapp.databinding.ActivityMainBinding;
+import com.sinch.android.rtc.PushPair;
+import com.sinch.android.rtc.Sinch;
+import com.sinch.android.rtc.SinchClient;
+import com.sinch.android.rtc.SinchError;
+import com.sinch.android.rtc.calling.Call;
+import com.sinch.android.rtc.calling.CallClient;
+import com.sinch.android.rtc.calling.CallClientListener;
+import com.sinch.android.rtc.calling.CallListener;
 import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     public static String id_user = "";
+    private static boolean isCreateCallApi = true;
     private DatabaseReference reference;
     FirebaseStorage firebaseStorage;
     StorageReference storageReference;
@@ -74,6 +90,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        if (ContextCompat.checkSelfPermission(MainActivity.this,
+                android.Manifest.permission.RECORD_AUDIO) !=
+                PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission
+                (MainActivity.this, android.Manifest.permission.READ_PHONE_STATE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(MainActivity.this,
+                    new String[]{android.Manifest.permission.RECORD_AUDIO, Manifest.permission.READ_PHONE_STATE},
+                    1);
+        }
         sharedPreferences = this.getSharedPreferences("Database", Context.MODE_PRIVATE);
         if (sharedPreferences != null) {
             phone = sharedPreferences.getString("phoneNumber", "null");
@@ -101,14 +126,22 @@ public class MainActivity extends AppCompatActivity {
         getToken();
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
-            if(bundle.getBoolean("isNotification")) {
+            if (bundle.getBoolean("isNotification")) {
                 User theirUser = (User) bundle.getSerializable("other_user");
                 Intent intent = new Intent(MainActivity.this, ChatActivity.class);
                 intent.putExtra("other_user", theirUser);
                 startActivity(intent);
             }
         }
+        PushVoiceCall.user = User.getInstance();
+        PushVoiceCall.context = MainActivity.this;
+        PushVoiceCall.activity = MainActivity.this;
+        if(isCreateCallApi) {
+            isCreateCallApi = false;
+            PushVoiceCall.addVoiceCallApi();
+        }
     }
+
 
     private void getToken() {
         FirebaseMessaging.getInstance().getToken()
@@ -219,6 +252,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
+        PushVoiceCall.context = MainActivity.this;
+        PushVoiceCall.activity = MainActivity.this;
         reference.child("Users").child(phone).child("status").child("is").setValue(true);
         super.onResume();
     }
@@ -619,5 +654,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 }
+
+
 
 
