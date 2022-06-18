@@ -22,6 +22,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -62,9 +63,18 @@ import com.quy.chatapp.Model.Room;
 import com.quy.chatapp.Model.User;
 import com.quy.chatapp.ModelView.ListChat;
 import com.quy.chatapp.ModelView.ZoomableImageView;
+import com.quy.chatapp.Notification.PushVoiceCall;
 import com.quy.chatapp.Notification.SendNotification;
 import com.quy.chatapp.R;
 import com.quy.chatapp.databinding.ActivityChatBinding;
+import com.sinch.android.rtc.PushPair;
+import com.sinch.android.rtc.Sinch;
+import com.sinch.android.rtc.SinchClient;
+import com.sinch.android.rtc.SinchError;
+import com.sinch.android.rtc.calling.Call;
+import com.sinch.android.rtc.calling.CallClient;
+import com.sinch.android.rtc.calling.CallClientListener;
+import com.sinch.android.rtc.calling.CallListener;
 import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
@@ -73,7 +83,9 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class ChatActivity extends AppCompatActivity {
@@ -118,7 +130,7 @@ public class ChatActivity extends AppCompatActivity {
 
         binding.sendIcon.setColorFilter(Color.parseColor("#192497"));
         user = User.getInstance();
-        if(user == null) {
+        if (user == null) {
             SharedPreferences sharedPreferences;
             sharedPreferences = this.getSharedPreferences("Database", Context.MODE_PRIVATE);
             if (sharedPreferences != null) {
@@ -355,6 +367,35 @@ public class ChatActivity extends AppCompatActivity {
 
             }
         });
+
+        binding.voiceCall.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (isFirstMess) {
+                    MyToast.show(ChatActivity.this, "Bạn chưa thể thực hiện cuộc gọi", 0);
+                } else {
+                    reference.child("Users").child(theirUser.getPhoneNumber()).child("isCall").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DataSnapshot> task) {
+                            reference.child("Users").child(user.getPhoneNumber()).child("isCall").setValue(user.getPhoneNumber());
+                            if (task.getResult().exists()) {
+                                MyToast.show(ChatActivity.this, theirUser.getUserName() + " đang thực hiện cuộc gọi", 0);
+                                reference.child("Users").child(user.getPhoneNumber()).child("isCall").setValue(null);
+                            } else {
+                                reference.child("Users").child(theirUser.getPhoneNumber()).child("isCall").setValue(user.getPhoneNumber());
+                                Intent intent = new Intent(ChatActivity.this, VoiceCallActivity.class);
+                                intent.putExtra("user", user);
+                                intent.putExtra("theirUser", theirUser);
+                                startActivityForResult(intent, 110011);
+                            }
+                        }
+                    });
+
+                }
+            }
+        });
+        PushVoiceCall.context = ChatActivity.this;
+        PushVoiceCall.activity = ChatActivity.this;
     }
 
 
@@ -501,6 +542,7 @@ public class ChatActivity extends AppCompatActivity {
     TextView user_name;
     Dialog dialog;
     RelativeLayout layout_icon;
+    CardView layout_call, layout_video;
 
     void openUserInfo() {
         dialog = new Dialog(ChatActivity.this, R.style.Dialogs);
@@ -512,6 +554,7 @@ public class ChatActivity extends AppCompatActivity {
         user_name = dialog.findViewById(R.id.user_name);
         icon_chat = dialog.findViewById(R.id.icon_chat);
         layout_icon = dialog.findViewById(R.id.layout_icon);
+        layout_call = dialog.findViewById(R.id.layout_call);
 
         et_name.setText(chat_room.getRoomName());
         user_name.setText(theirUser.getUserName());
@@ -591,6 +634,33 @@ public class ChatActivity extends AppCompatActivity {
                 startActivityForResult(new Intent(ChatActivity.this, ChooseIcon.class), 1100);
             }
         });
+
+        layout_call.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (isFirstMess) {
+                    MyToast.show(ChatActivity.this, "Bạn chưa thể thực hiện cuộc gọi", 0);
+                } else {
+                    reference.child("Users").child(theirUser.getPhoneNumber()).child("isCall").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DataSnapshot> task) {
+                            reference.child("Users").child(user.getPhoneNumber()).child("isCall").setValue(user.getPhoneNumber());
+                            if (task.getResult().exists()) {
+                                MyToast.show(ChatActivity.this, theirUser.getUserName() + " đang thực hiện cuộc gọi", 0);
+                                reference.child("Users").child(user.getPhoneNumber()).child("isCall").setValue(null);
+                            } else {
+                                reference.child("Users").child(theirUser.getPhoneNumber()).child("isCall").setValue(user.getPhoneNumber());
+                                Intent intent = new Intent(ChatActivity.this, VoiceCallActivity.class);
+                                intent.putExtra("user", user);
+                                intent.putExtra("theirUser", theirUser);
+                                startActivityForResult(intent, 110011);
+                            }
+                        }
+                    });
+
+                }
+            }
+        });
     }
 
     Uri uri;
@@ -623,6 +693,9 @@ public class ChatActivity extends AppCompatActivity {
             showImageVideo(data);
         } else if (requestCode == 101 && resultCode == RESULT_OK && data != null) {
             showImage(data);
+        } else if (requestCode == 110011 && data != null) {
+            String status = data.getExtras().getString("status");
+            sendMess(status, "call");
         }
     }
 
@@ -676,7 +749,7 @@ public class ChatActivity extends AppCompatActivity {
                                         sendFile(uri.toString(), isImage);
                                         String mess_content = content_file_mess.getText().toString().trim();
                                         if (!mess_content.isEmpty()) {
-                                            sendMess(mess_content);
+                                            sendMess(mess_content, "text");
                                         }
                                         progress.dismiss();
                                         dialog_image.dismiss();
@@ -741,7 +814,7 @@ public class ChatActivity extends AppCompatActivity {
                                         sendFile(uri.toString(), isImage);
                                         String mess_content = content_file_mess.getText().toString().trim();
                                         if (!mess_content.isEmpty()) {
-                                            sendMess(mess_content);
+                                            sendMess(mess_content, "text");
                                         }
                                         progress.dismiss();
                                         dialog_image.dismiss();
@@ -899,20 +972,20 @@ public class ChatActivity extends AppCompatActivity {
             public void onClick(View view) {
                 String mess_content = binding.inputMessage.getText().toString().trim();
                 if (!mess_content.isEmpty()) {
-                    sendMess(mess_content);
+                    sendMess(mess_content, "text");
                 }
 
             }
         });
     }
 
-    private void sendMess(String mess_content) {
+    private void sendMess(String mess_content, String type) {
         String time_now = String.valueOf(System.currentTimeMillis());
         Mess mess = new Mess();
         mess.setMessage(mess_content);
         mess.setTime(time_now);
         mess.setUserId(user.getPhoneNumber());
-        mess.setType("text");
+        mess.setType(type);
         if (isFirstMess) {
             Room room = new Room();
             room.setRoomType("chat");
@@ -964,5 +1037,4 @@ public class ChatActivity extends AppCompatActivity {
         reference.child("Rooms").child(chat_room.getRoomID()).child("listSeen").child(user.getPhoneNumber()).child("in").setValue(time_now);
         reference.child("Rooms").child(chat_room.getRoomID()).child("listSeen").child(theirUser.getPhoneNumber()).child("is").setValue(false);
     }
-
 }
