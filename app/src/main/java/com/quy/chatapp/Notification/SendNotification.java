@@ -21,7 +21,7 @@ public class SendNotification {
     private static String BASE_URL = "https://fcm.googleapis.com/fcm/send";
     private static String SERVER_KEY = "key=AAAAU7MZJ2Q:APA91bEdAuS5DpPDV9slZjwrALdmR3CFs6gQyOhYL6nvrQPTzxIllF5_-U0Muil6-4l4IFLN4gaekCx_ELaq5PzRMLddQPSOi1gsElw7bXZOM-VHI1hJXbyKIvDPkjVUOlaaxg7-lxkQ";
 
-    public static void send(Context context, String token, String title, String message, String id, String type, String image) {
+    public static void send(Context context, String token, String title, String message, String id, String type, String image, boolean isGroup) {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
         RequestQueue queue = Volley.newRequestQueue(context);
@@ -33,6 +33,7 @@ public class SendNotification {
             jsonObject.put("id", id);
             jsonObject.put("type", type);
             jsonObject.put("image", image);
+            jsonObject.put("isGroup", isGroup);
             json.put("to", token);
             json.put("data", jsonObject);
             json.put("priority", "high");

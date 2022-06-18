@@ -26,6 +26,7 @@ import androidx.core.app.NotificationManagerCompat;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+import com.quy.chatapp.Model.Room;
 import com.quy.chatapp.Model.User;
 import com.quy.chatapp.R;
 import com.quy.chatapp.View.ChatActivity;
@@ -53,6 +54,7 @@ public class PushChatNotification extends FirebaseMessagingService {
         String mess = dataPayload.get("body");
         String id = dataPayload.get("id");
         String type = dataPayload.get("type");
+        boolean isGroup = Boolean.parseBoolean(dataPayload.get("isGroup"));
         String uriImage = "";
         if ("image".equals(type)) {
             uriImage = mess;
@@ -89,13 +91,18 @@ public class PushChatNotification extends FirebaseMessagingService {
         }
 
         String CHANNEL_ID = "MESSAGE" + System.currentTimeMillis();
-
         Intent resultIntent = new Intent(this, MainActivity.class);
         User user = new User();
-        user.phoneNumber = id;
-        user.userName = title;
-        user.userAvatar = image;
-        resultIntent.putExtra("other_user", user);
+        if(isGroup) {
+            resultIntent.putExtra("room_id", id);
+        } else {
+            user.phoneNumber = id;
+            user.userName = title;
+            user.userAvatar = image;
+            resultIntent.putExtra("other_user", user);
+        }
+
+        resultIntent.putExtra("isGroup", isGroup);
         resultIntent.putExtra("isNotification", true);
 
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);

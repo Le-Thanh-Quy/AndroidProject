@@ -182,11 +182,17 @@ public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
                 } else {
                     holder.mess_notification.setText(theirUser.getUserName() + " đã đặt biệt hiệu cho bạn là " + contentNotification[1]);
                 }
-            } else {
+            } else if (contentNotification[0].equals("2")) {
                 if (mess.getUserId().equals(myPhone)) {
                     holder.mess_notification.setText("Bạn đã thay đổi biểu tượng cảm xúc cuộc trò chuyện");
                 } else {
                     holder.mess_notification.setText(theirUser.getUserName() + " đã thay đổi biểu tượng cảm xúc cuộc trò chuyện");
+                }
+            } else {
+                if (mess.getUserId().equals(myPhone)) {
+                    holder.mess_notification.setText("Bạn đã tạo nhóm");
+                } else {
+                    holder.mess_notification.setText(theirUser.getUserName() + " đã tạo nhóm này");
                 }
             }
 
@@ -594,7 +600,7 @@ public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
                 switch (which) {
                     case DialogInterface.BUTTON_POSITIVE:
                         reference.child("Rooms").child(roomID).child("listMess").child(mess.getTime()).child("type").setValue("delete");
-                        SendNotification.send(context, theirUser.getToken(), User.getInstance().getUserName(), "Đã thu hồi một tin nhắn", myPhone, "delete", User.getInstance().getUserAvatar());
+                        SendNotification.send(context, theirUser.getToken(), User.getInstance().getUserName(), "Đã thu hồi một tin nhắn", myPhone, "delete", User.getInstance().getUserAvatar(), false);
                         break;
 
                     case DialogInterface.BUTTON_NEGATIVE:

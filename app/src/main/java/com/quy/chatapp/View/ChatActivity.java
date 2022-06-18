@@ -902,10 +902,10 @@ public class ChatActivity extends AppCompatActivity {
             eventChat();
         } else {
             if (isImage) {
-                SendNotification.send(ChatActivity.this, theirUser.getToken(), user.getUserName(), mess.getMessage(), user.getPhoneNumber(), mess.getType(), user.getUserAvatar());
+                SendNotification.send(ChatActivity.this, theirUser.getToken(), user.getUserName(), mess.getMessage(), user.getPhoneNumber(), mess.getType(), user.getUserAvatar(), false);
                 nextMess(time_now, "Đã gửi một ảnh", mess);
             } else {
-                SendNotification.send(ChatActivity.this, theirUser.getToken(), user.getUserName(), "Đã gửi một video", user.getPhoneNumber(), mess.getType(), user.getUserAvatar());
+                SendNotification.send(ChatActivity.this, theirUser.getToken(), user.getUserName(), "Đã gửi một video", user.getPhoneNumber(), mess.getType(), user.getUserAvatar(), false);
                 nextMess(time_now, "Đã gửi một video", mess);
             }
 
@@ -958,7 +958,7 @@ public class ChatActivity extends AppCompatActivity {
             chat_room.setRoomID(time_now);
             eventChat();
         } else {
-            SendNotification.send(ChatActivity.this, theirUser.getToken(), user.getUserName(), "Đã gửi một biểu cảm", user.getPhoneNumber(), mess.getType(), user.getUserAvatar());
+            SendNotification.send(ChatActivity.this, theirUser.getToken(), user.getUserName(), "Đã gửi một biểu cảm", user.getPhoneNumber(), mess.getType(), user.getUserAvatar(), false);
             nextMess(time_now, "Đã gửi một biểu cảm", mess);
         }
         offKeyboard();
@@ -1001,7 +1001,7 @@ public class ChatActivity extends AppCompatActivity {
             chat_room.setRoomID(time_now);
             eventChat();
         } else {
-            SendNotification.send(ChatActivity.this, theirUser.getToken(), user.getUserName(), mess_content, user.getPhoneNumber(), mess.getType(), user.getUserAvatar());
+            SendNotification.send(ChatActivity.this, theirUser.getToken(), user.getUserName(), mess_content, user.getPhoneNumber(), mess.getType(), user.getUserAvatar(), false);
             nextMess(time_now, mess_content, mess);
         }
         binding.inputMessage.setText("");
