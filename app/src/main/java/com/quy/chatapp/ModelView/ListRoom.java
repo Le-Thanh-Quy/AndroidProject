@@ -74,7 +74,6 @@ public class ListRoom extends RecyclerView.Adapter<ListRoom.viewHolder> {
                         String name = task.getResult().child("roomName").getValue(String.class);
                         String image = task.getResult().child("imageRoom").getValue(String.class);
                         holder.roomName.setText(name);
-                        assert image != null;
                         Picasso.get()
                                 .load(image)
                                 .fit()

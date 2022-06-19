@@ -73,6 +73,7 @@ public class PushVoiceCall {
         sinchClient = Sinch.getSinchClientBuilder()
                 .context(context)
                 .applicationKey(APIKEY)
+                .applicationSecret(SECRET)
                 .environmentHost("clientapi.sinch.com")
                 .userId(user.getPhoneNumber())
                 .build();
