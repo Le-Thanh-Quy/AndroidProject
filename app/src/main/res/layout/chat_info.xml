@@ -23,7 +23,7 @@
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="60dp"
-            app:cardCornerRadius="100dp">
+            app:cardCornerRadius="150dp">
 
             <ImageView
                 android:id="@+id/user_avatar"
@@ -31,6 +31,25 @@
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
                 android:src="@drawable/profile" />
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/layout_add_avatar"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_below="@+id/layout_avatar"
+            android:layout_marginStart="-50dp"
+            android:layout_marginTop="-50dp"
+            android:backgroundTint="#ECF4FD"
+            android:layout_toEndOf="@+id/layout_avatar"
+            app:cardCornerRadius="100dp">
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:scaleType="centerCrop"
+                android:layout_gravity="center"
+                android:src="@drawable/add_avatar" />
         </androidx.cardview.widget.CardView>
 
         <LinearLayout

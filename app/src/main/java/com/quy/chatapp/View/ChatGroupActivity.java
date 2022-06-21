@@ -109,6 +109,7 @@ public class ChatGroupActivity extends AppCompatActivity {
         isSeen = true;
         isOpenSeen = true;
         listUser = new ArrayList<>();
+
         this.overridePendingTransition(R.anim.animation_enter, R.anim.animation_leave);
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
@@ -162,7 +163,6 @@ public class ChatGroupActivity extends AppCompatActivity {
                             eventChat();
                             sendMessEvent();
                             sendIconEvent();
-                            binding.avatar.setImageDrawable(getDrawable(R.drawable.team));
                             binding.userOnline.setVisibility(View.GONE);
                         }
                     });
@@ -308,6 +308,7 @@ public class ChatGroupActivity extends AppCompatActivity {
                 }
             }).into(binding.avatar);
         } else {
+            binding.avatar.setImageDrawable(getDrawable(R.drawable.team));
             BitmapDrawable drawable = (BitmapDrawable) binding.avatar.getDrawable();
             bitmapAvatar = drawable.getBitmap();
         }
@@ -447,7 +448,7 @@ public class ChatGroupActivity extends AppCompatActivity {
     TextView user_name;
     Dialog dialog;
     RelativeLayout layout_icon;
-    CardView layout_call, layout_video, add_user;
+    CardView layout_call, layout_video, add_user, layout_add_avatar;
 
     void openChatInfo() {
         dialog = new Dialog(ChatGroupActivity.this, R.style.Dialogs);
@@ -461,6 +462,8 @@ public class ChatGroupActivity extends AppCompatActivity {
         layout_icon = dialog.findViewById(R.id.layout_icon);
         layout_call = dialog.findViewById(R.id.layout_call);
         add_user = dialog.findViewById(R.id.add_user);
+        layout_add_avatar = dialog.findViewById(R.id.layout_add_avatar);
+
 
         add_user.setVisibility(View.VISIBLE);
         TextView textView = dialog.findViewById(R.id.title_name);
@@ -552,6 +555,46 @@ public class ChatGroupActivity extends AppCompatActivity {
                 openDialogAddFriend();
             }
         });
+
+        layout_add_avatar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Dialog dialog = new Dialog(ChatGroupActivity.this, R.style.Dialogs);
+                dialog.setContentView(R.layout.layout_option_image);
+                TextView takePhoto;
+                TextView chooseFromGallery;
+                TextView cancel;
+                takePhoto = dialog.findViewById(R.id.takePhoto);
+                chooseFromGallery = dialog.findViewById(R.id.chooseFromGallery);
+                cancel = dialog.findViewById(R.id.cancel_option);
+
+
+                dialog.show();
+                takePhoto.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        startActivityForResult(intent, 1019);
+                        dialog.dismiss();
+                    }
+                });
+                chooseFromGallery.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        startActivityForResult(Intent.createChooser(new Intent()
+                                .setAction(Intent.ACTION_GET_CONTENT)
+                                .setType("image/*"), "pickFile"), 119);
+                        dialog.dismiss();
+                    }
+                });
+                cancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                    }
+                });
+            }
+        });
     }
 
 
@@ -637,12 +680,12 @@ public class ChatGroupActivity extends AppCompatActivity {
                 reference.child("Rooms").child(roomID).child("listSeen").child(search_phone).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DataSnapshot> task) {
-                        if(task.getResult().exists()) {
+                        if (task.getResult().exists()) {
                             MyToast.show(ChatGroupActivity.this, "Người này hiện đang ở trong nhóm", 0);
                         } else {
                             String time = String.valueOf(System.currentTimeMillis());
                             Mess mess = new Mess();
-                            mess.setMessage("4__@__" + finalSearch_phone);
+                            mess.setMessage("4__@__" + name_result.getText().toString().trim());
                             mess.setTime(time);
                             mess.setType("notification");
                             mess.setUserId(user.getPhoneNumber());
@@ -658,12 +701,10 @@ public class ChatGroupActivity extends AppCompatActivity {
                             listUser.add(finalSearch_phone);
                             for (String user_phone : listUser) {
                                 reference.child("Rooms").child(roomID).child("listSeen").child(user_phone).child("is").setValue(false);
-                                reference.child("Rooms").child(roomID).child("roomName").setValue(binding.textName.getText().toString().trim());
-                                reference.child("Rooms").child(roomID).child("imageRoom").setValue("null");
                                 reference.child("Users").child(user_phone).child("rooms").child(roomID).setValue(room).addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
-                                        if(dialog.isShowing()) {
+                                        if (dialog.isShowing()) {
                                             dialog.dismiss();
                                         }
                                     }
@@ -710,6 +751,100 @@ public class ChatGroupActivity extends AppCompatActivity {
         } else if (requestCode == 110011 && data != null) {
             String status = data.getExtras().getString("status");
             sendMess(status, "call");
+        } else if (requestCode == 1019 && resultCode == RESULT_OK && data != null) {
+            ProgressDialog progress = new ProgressDialog(ChatGroupActivity.this);
+            progress.setTitle("Loading");
+            progress.setMessage("Updating...");
+            progress.setCancelable(false);
+            try {
+                progress.show();
+            } catch (Exception e) {
+                System.out.println(e.toString());
+            }
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            Bitmap bitmap = (Bitmap) data.getExtras().get("data");
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+            user_avatar.setImageBitmap(bitmap);
+            binding.avatar.setImageBitmap(bitmap);
+            bytes = byteArrayOutputStream.toByteArray();
+            uri = null;
+            if (bytes != null) {
+                storageReference = firebaseStorage.getReference().child("Chats").child(user.getPhoneNumber()).child(String.valueOf(System.currentTimeMillis()));
+                storageReference.putBytes(bytes).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+                                    reference.child("Rooms").child(roomID).child("imageRoom").setValue(uri.toString());
+                                    String time_now = String.valueOf(System.currentTimeMillis());
+                                    Mess mess = new Mess();
+                                    mess.setType("notification");
+                                    mess.setUserId(user.getPhoneNumber());
+                                    mess.setTime(time_now);
+                                    mess.setMessage("5__@__");
+                                    reference.child("Rooms").child(chat_room.getRoomID()).child("listMess").child(time_now).setValue(mess);
+                                    chat_room.setImageRoom(uri.toString());
+                                    progress.dismiss();
+                                }
+                            });
+                        } else {
+                            progress.dismiss();
+                            MyToast.show(ChatGroupActivity.this, "Error", Toast.LENGTH_SHORT);
+                        }
+                    }
+                });
+            }
+
+        } else if (requestCode == 119 && resultCode == RESULT_OK && data != null) {
+            ProgressDialog progress = new ProgressDialog(ChatGroupActivity.this);
+            progress.setTitle("Loading");
+            progress.setMessage("Updating...");
+            progress.setCancelable(false);
+            try {
+                progress.show();
+            } catch (Exception e) {
+                System.out.println(e.toString());
+            }
+            bytes = null;
+            uri = data.getData();
+            try {
+                InputStream inputStream = getContentResolver().openInputStream(uri);
+                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                user_avatar.setImageBitmap(bitmap);
+                binding.avatar.setImageBitmap(bitmap);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            if (uri != null) {
+                storageReference = firebaseStorage.getReference().child("Chats").child(user.getPhoneNumber()).child(String.valueOf(System.currentTimeMillis()));
+                storageReference.putFile(uri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+                                    reference.child("Rooms").child(roomID).child("imageRoom").setValue(uri.toString());
+                                    String time_now = String.valueOf(System.currentTimeMillis());
+                                    Mess mess = new Mess();
+                                    mess.setType("notification");
+                                    mess.setUserId(user.getPhoneNumber());
+                                    mess.setTime(time_now);
+                                    mess.setMessage("5__@__");
+                                    reference.child("Rooms").child(chat_room.getRoomID()).child("listMess").child(time_now).setValue(mess);
+                                    chat_room.setImageRoom(uri.toString());
+                                    progress.dismiss();
+                                }
+                            });
+                        } else {
+                            progress.dismiss();
+                            MyToast.show(ChatGroupActivity.this, "Error", Toast.LENGTH_SHORT);
+                        }
+                    }
+                });
+            }
         }
     }
 

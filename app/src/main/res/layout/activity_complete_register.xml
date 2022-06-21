@@ -105,7 +105,7 @@
             android:layout_alignEnd="@+id/card_view_avatar"
             android:layout_marginTop="-45dp"
             android:layout_marginEnd="5dp"
-            android:backgroundTint="#CBF6D7"
+            android:backgroundTint="#CBDCF6"
             app:cardCornerRadius="100dp">
 
             <ImageView

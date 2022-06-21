@@ -552,7 +552,7 @@ public class ChatActivity extends AppCompatActivity {
     TextView user_name;
     Dialog dialog;
     RelativeLayout layout_icon;
-    CardView layout_call, layout_video;
+    CardView layout_call, layout_video, layout_add_avatar;
 
     void openUserInfo() {
         dialog = new Dialog(ChatActivity.this, R.style.Dialogs);
@@ -565,7 +565,8 @@ public class ChatActivity extends AppCompatActivity {
         icon_chat = dialog.findViewById(R.id.icon_chat);
         layout_icon = dialog.findViewById(R.id.layout_icon);
         layout_call = dialog.findViewById(R.id.layout_call);
-
+        layout_add_avatar = dialog.findViewById(R.id.layout_add_avatar);
+        layout_add_avatar.setVisibility(View.GONE);
         et_name.setText(chat_room.getRoomName());
         user_name.setText(theirUser.getUserName());
         if (chat_room.getIconId() != null) {

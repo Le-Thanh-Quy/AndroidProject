@@ -99,7 +99,6 @@ public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
         holder.their_mess_video.setVisibility(View.GONE);
 
 
-
         if (isGroup) {
             holder.layout_seen.setVisibility(View.INVISIBLE);
             holder.layout_seen_their.setVisibility(View.INVISIBLE);
@@ -218,13 +217,13 @@ public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
             String[] contentNotification = mess.getMessage().split("__@__");
             if (contentNotification[0].equals("1")) {
                 if (mess.getUserId().equals(myPhone)) {
-                    if(isGroup) {
+                    if (isGroup) {
                         holder.mess_notification.setText("Bạn đã đặt tên cho nhóm là " + contentNotification[1]);
                     } else {
                         holder.mess_notification.setText("Bạn đã đặt biệt hiệu cho " + theirUser.getUserName() + " là " + contentNotification[1]);
                     }
                 } else {
-                    if(isGroup) {
+                    if (isGroup) {
                         holder.mess_notification.setText(theirUser.getUserName() + " đã đặt tên nhóm là " + contentNotification[1]);
                     } else {
                         holder.mess_notification.setText(theirUser.getUserName() + " đã đặt biệt hiệu cho bạn là " + contentNotification[1]);
@@ -236,7 +235,19 @@ public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
                 } else {
                     holder.mess_notification.setText(theirUser.getUserName() + " đã thay đổi biểu tượng cảm xúc cuộc trò chuyện");
                 }
-            } else {
+            } else if (contentNotification[0].equals("4")) {
+                if (mess.getUserId().equals(myPhone)) {
+                    holder.mess_notification.setText("Bạn đã thêm " + contentNotification[1] + " vào nhóm");
+                } else {
+                    holder.mess_notification.setText(theirUser.getUserName() + " đã thêm " + contentNotification[1] + " vào nhóm");
+                }
+            } else if (contentNotification[0].equals("5")) {
+                if (mess.getUserId().equals(myPhone)) {
+                    holder.mess_notification.setText("Bạn đã thay đổi ảnh nhóm");
+                } else {
+                    holder.mess_notification.setText(theirUser.getUserName() + " đã thay đổi ảnh nhóm");
+                }
+            } else if (contentNotification[0].equals("3")) {
                 if (mess.getUserId().equals(myPhone)) {
                     holder.mess_notification.setText("Bạn đã tạo nhóm");
                 } else {
