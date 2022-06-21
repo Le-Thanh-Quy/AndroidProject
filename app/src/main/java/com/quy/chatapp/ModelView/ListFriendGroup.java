@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -59,9 +60,9 @@ public class ListFriendGroup extends RecyclerView.Adapter<ListFriendGroup.viewHo
         User user = listData.get(position);
         holder.friendName.setText(user.getUserName());
         if (!"null".equals(user.getUserAvatar())) {
-            Picasso.get()
+            Glide.with(context)
                     .load(user.getUserAvatar())
-                    .fit().centerInside()
+                    .centerInside()
                     .error(R.drawable.profile)
                     .placeholder(R.drawable.profile)
                     .into(holder.friendAvatar);

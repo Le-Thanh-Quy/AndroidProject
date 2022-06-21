@@ -30,6 +30,7 @@ import android.text.method.PasswordTransformationMethod;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -37,6 +38,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -84,12 +86,18 @@ public class MainActivity extends AppCompatActivity {
     SharedPreferences sharedPreferences;
     String phone;
     int countBack = 0;
-
+    private void offKeyboard() {
+        if(getCurrentFocus() != null) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        offKeyboard();
         if (ContextCompat.checkSelfPermission(MainActivity.this,
                 android.Manifest.permission.RECORD_AUDIO) !=
                 PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission
@@ -173,9 +181,9 @@ public class MainActivity extends AppCompatActivity {
                     String avatar = User.getInstance().getUserAvatar();
                     assert avatar != null;
                     if (!avatar.equals("null")) {
-                        Picasso.get()
+                        Glide.with(MainActivity.this)
                                 .load(avatar) // web image url
-                                .fit().centerInside()
+                                .centerInside()
 //                                .rotate(90)
                                 .error(R.drawable.profile)
                                 .placeholder(R.drawable.profile)

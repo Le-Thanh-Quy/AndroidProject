@@ -17,6 +17,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -25,6 +27,7 @@ import android.text.TextWatcher;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -35,6 +38,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -51,6 +59,7 @@ import com.quy.chatapp.Model.MyToast;
 import com.quy.chatapp.Model.Room;
 import com.quy.chatapp.Model.User;
 import com.quy.chatapp.ModelView.ListChat;
+import com.quy.chatapp.ModelView.ListFriendGroup;
 import com.quy.chatapp.ModelView.ZoomableImageView;
 import com.quy.chatapp.Notification.PushVoiceCall;
 import com.quy.chatapp.Notification.SendNotification;
@@ -76,9 +85,8 @@ public class ChatGroupActivity extends AppCompatActivity {
 
     ActivityChatGroupBinding binding;
     DatabaseReference reference;
-    boolean isFirstMess = false;
     User user;
-    User theirUser;
+    String roomID;
     Room chat_room;
     List<Mess> listData;
     ListChat listChat;
@@ -88,6 +96,7 @@ public class ChatGroupActivity extends AppCompatActivity {
     FirebaseStorage firebaseStorage;
     StorageReference storageReference;
     boolean isNotification = false;
+    ArrayList<String> listUser;
 
 
     @Override
@@ -99,10 +108,11 @@ public class ChatGroupActivity extends AppCompatActivity {
         firebaseStorage = FirebaseStorage.getInstance();
         isSeen = true;
         isOpenSeen = true;
+        listUser = new ArrayList<>();
         this.overridePendingTransition(R.anim.animation_enter, R.anim.animation_leave);
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
-            theirUser = (User) bundle.getSerializable("other_user");
+            roomID = bundle.getString("id_room");
             isNotification = bundle.getBoolean("isNotification");
         }
 
@@ -131,23 +141,39 @@ public class ChatGroupActivity extends AppCompatActivity {
         chat_room = new Room();
         listData = new ArrayList<>();
 
-        reference.child("Users").child(user.getPhoneNumber()).child("rooms").child(theirUser.getPhoneNumber()).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+        reference.child("Rooms").child(roomID).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
                 if (task.getResult().exists()) {
                     Room room = task.getResult().getValue(Room.class);
                     assert room != null;
-                    chat_room.setRoomID(room.getRoomID());
+                    chat_room.setRoomID(roomID);
                     chat_room.setRoomName(room.getRoomName());
+                    chat_room.setImageRoom(room.getImageRoom());
+                    reference.child("Rooms").child(roomID).child("listSeen").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DataSnapshot> task) {
+                            for (DataSnapshot dataSnapshot : task.getResult().getChildren()) {
+                                String phoneNumber = dataSnapshot.getKey();
+                                listUser.add(phoneNumber);
+                            }
+                            uiEvent();
+                            loadPage();
+                            eventChat();
+                            sendMessEvent();
+                            sendIconEvent();
+                            binding.avatar.setImageDrawable(getDrawable(R.drawable.team));
+                            binding.userOnline.setVisibility(View.GONE);
+                        }
+                    });
                 } else {
-                    binding.notFound.setVisibility(View.VISIBLE);
-                    isFirstMess = true;
+                    Intent intent = new Intent(ChatGroupActivity.this, MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finishAndRemoveTask();
+                    return;
                 }
 
-                uiEvent();
-                loadPage();
-                sendMessEvent();
-                sendIconEvent();
             }
         });
 
@@ -185,7 +211,7 @@ public class ChatGroupActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        MainActivity.id_user = theirUser.phoneNumber;
+        MainActivity.id_user = roomID;
         isSeen = true;
         reference.child("Users").child(user.getPhoneNumber()).child("status").child("is").setValue(true);
         super.onResume();
@@ -205,7 +231,6 @@ public class ChatGroupActivity extends AppCompatActivity {
                     binding.notFound.setVisibility(View.VISIBLE);
                 } else {
                     binding.notFound.setVisibility(View.GONE);
-                    reference.child("Rooms").child(chat_room.getRoomID()).child("listSeen").child(user.getPhoneNumber()).child("in").setValue(listData.get(listData.size() - 1).getTime());
                     reference.child("Rooms").child(chat_room.getRoomID()).child("listSeen").child(user.getPhoneNumber()).child("is").setValue(true);
                 }
                 binding.progressBar.setVisibility(View.GONE);
@@ -233,7 +258,7 @@ public class ChatGroupActivity extends AppCompatActivity {
     };
 
     private void eventChat() {
-        listChat = new ListChat(listData, ChatGroupActivity.this, user.getPhoneNumber(), false, theirUser, chat_room.getRoomID(), bitmapAvatar);
+        listChat = new ListChat(listData, ChatGroupActivity.this, user.getPhoneNumber(), true, new User(), chat_room.getRoomID(), bitmapAvatar);
         LinearLayoutManager layoutManager =
                 new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false);
         layoutManager.setStackFromEnd(true);
@@ -267,113 +292,26 @@ public class ChatGroupActivity extends AppCompatActivity {
     }
 
     private void loadPage() {
-        if (chat_room.getRoomName() != null) {
-            binding.textName.setText(chat_room.getRoomName());
-        } else {
-            binding.textName.setText(theirUser.getUserName());
-        }
-
-        if (!theirUser.getUserAvatar().equals("null")) {
-            Picasso.get().load(theirUser.getUserAvatar()).fit().centerCrop().placeholder(ChatGroupActivity.this.getResources().getDrawable(R.drawable.profile)).into(binding.avatar, new com.squareup.picasso.Callback() {
+        binding.textName.setText(chat_room.getRoomName());
+        if (!chat_room.getImageRoom().equals("null")) {
+            Glide.with(ChatGroupActivity.this).load(chat_room.getImageRoom()).centerCrop().placeholder(ChatGroupActivity.this.getResources().getDrawable(R.drawable.team)).listener(new RequestListener<Drawable>() {
                 @Override
-                public void onSuccess() {
+                public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                    return false;
+                }
+
+                @Override
+                public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
                     BitmapDrawable drawable = (BitmapDrawable) binding.avatar.getDrawable();
                     bitmapAvatar = drawable.getBitmap();
-                    if (chat_room.getRoomID() != null) {
-                        eventChat();
-                    }
+                    return false;
                 }
-
-                @Override
-                public void onError(Exception e) {
-
-                }
-            });
+            }).into(binding.avatar);
         } else {
             BitmapDrawable drawable = (BitmapDrawable) binding.avatar.getDrawable();
             bitmapAvatar = drawable.getBitmap();
         }
 
-        reference.child("Users").child(theirUser.getPhoneNumber()).child("status").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.getValue() != null) {
-                    Boolean isOnline = snapshot.child("is").getValue(Boolean.class);
-                    if (!isOnline) {
-                        binding.userOnline.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#979797")));
-                        String time = snapshot.child("in").getValue(String.class);
-                        ;
-                        long lassMessTime = Long.parseLong(time);
-                        long hours = TimeUnit.MILLISECONDS.toHours(System.currentTimeMillis() - lassMessTime);
-                        long minutes = TimeUnit.MILLISECONDS.toMinutes(System.currentTimeMillis() - lassMessTime);
-                        if (minutes == 0) {
-                            binding.textOnline.setText("Vừa truy cập");
-                        } else if (minutes < 60) {
-                            binding.textOnline.setText("Hoạt động " + minutes + " phút trước");
-                        } else if (hours < 24) {
-                            binding.textOnline.setText("Hoạt động " + hours + " giờ trước");
-                        } else if (hours < 24 * 5 + 1) {
-                            binding.textOnline.setText("Hoạt động " + hours / 24 + " ngày trước");
-                        } else {
-                            binding.textOnline.setText("Đang ngoại tuyến");
-                        }
-                    } else {
-                        binding.userOnline.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#5FD364")));
-                        binding.textOnline.setText("Đang hoạt động");
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
-        reference.child("Users").child(user.getPhoneNumber()).child("friends").child(theirUser.getPhoneNumber()).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (!snapshot.exists()) {
-                    binding.layoutAddFriend.setVisibility(View.VISIBLE);
-                } else {
-                    binding.layoutAddFriend.setVisibility(View.GONE);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
-        binding.voiceCall.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (isFirstMess) {
-                    MyToast.show(ChatGroupActivity.this, "Bạn chưa thể thực hiện cuộc gọi", 0);
-                } else {
-                    reference.child("Users").child(theirUser.getPhoneNumber()).child("isCall").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<DataSnapshot> task) {
-                            reference.child("Users").child(user.getPhoneNumber()).child("isCall").setValue(user.getPhoneNumber());
-                            if (task.getResult().exists()) {
-                                MyToast.show(ChatGroupActivity.this, theirUser.getUserName() + " đang thực hiện cuộc gọi", 0);
-                                reference.child("Users").child(user.getPhoneNumber()).child("isCall").setValue(null);
-                            } else {
-                                reference.child("Users").child(theirUser.getPhoneNumber()).child("isCall").setValue(user.getPhoneNumber());
-                                Intent intent = new Intent(ChatGroupActivity.this, VoiceCallActivity.class);
-                                intent.putExtra("user", user);
-                                intent.putExtra("theirUser", theirUser);
-                                startActivityForResult(intent, 110011);
-                            }
-                        }
-                    });
-
-                }
-            }
-        });
-        PushVoiceCall.context = ChatGroupActivity.this;
-        PushVoiceCall.activity = ChatGroupActivity.this;
     }
 
 
@@ -459,12 +397,7 @@ public class ChatGroupActivity extends AppCompatActivity {
         binding.userInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (isFirstMess) {
-                    MyToast.show(ChatGroupActivity.this, "Bạn chưa tạo tin nhắn với người này", Toast.LENGTH_SHORT);
-                } else {
-                    openUserInfo();
-                }
-
+                openChatInfo();
             }
         });
 
@@ -507,12 +440,6 @@ public class ChatGroupActivity extends AppCompatActivity {
                 });
             }
         });
-        binding.addFriend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                reference.child("Users").child(user.getPhoneNumber()).child("friends").child(theirUser.getPhoneNumber()).setValue(theirUser.getPhoneNumber());
-            }
-        });
     }
 
     ImageView close_chat_info, user_avatar, edit_name, icon_chat;
@@ -520,9 +447,9 @@ public class ChatGroupActivity extends AppCompatActivity {
     TextView user_name;
     Dialog dialog;
     RelativeLayout layout_icon;
-    CardView layout_call, layout_video;
+    CardView layout_call, layout_video, add_user;
 
-    void openUserInfo() {
+    void openChatInfo() {
         dialog = new Dialog(ChatGroupActivity.this, R.style.Dialogs);
         dialog.setContentView(R.layout.chat_info);
         close_chat_info = dialog.findViewById(R.id.close_chat_info);
@@ -533,9 +460,15 @@ public class ChatGroupActivity extends AppCompatActivity {
         icon_chat = dialog.findViewById(R.id.icon_chat);
         layout_icon = dialog.findViewById(R.id.layout_icon);
         layout_call = dialog.findViewById(R.id.layout_call);
+        add_user = dialog.findViewById(R.id.add_user);
 
+        add_user.setVisibility(View.VISIBLE);
+        TextView textView = dialog.findViewById(R.id.title_name);
+        textView.setText("Tên nhóm:");
+
+        user_avatar.setImageDrawable(getDrawable(R.drawable.team));
         et_name.setText(chat_room.getRoomName());
-        user_name.setText(theirUser.getUserName());
+        user_name.setText(chat_room.getRoomName());
         if (chat_room.getIconId() != null) {
             int idIcon = this.getResources().getIdentifier("like_mess_" + chat_room.getIconId(), "drawable", this.getPackageName());
             icon_chat.setImageResource(idIcon);
@@ -546,13 +479,13 @@ public class ChatGroupActivity extends AppCompatActivity {
             icon_chat.setColorFilter(Color.parseColor("#192497"));
         }
 
-        if (!theirUser.getUserAvatar().equals("null")) {
+        if (!chat_room.getImageRoom().equals("null")) {
 
             Picasso.get()
-                    .load(theirUser.getUserAvatar()) // web image url
+                    .load(chat_room.getImageRoom()) // web image url
                     .fit().centerInside()
-                    .error(R.drawable.profile)
-                    .placeholder(R.drawable.profile)
+                    .error(R.drawable.team)
+                    .placeholder(R.drawable.team)
                     .into(user_avatar);
         }
 
@@ -592,7 +525,7 @@ public class ChatGroupActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String content = et_name.getText().toString();
-                reference.child("Users").child(user.getPhoneNumber()).child("rooms").child(theirUser.getPhoneNumber()).child("roomName").setValue(content);
+                reference.child("Rooms").child(roomID).child("roomName").setValue(content);
                 String time_now = String.valueOf(System.currentTimeMillis());
                 Mess mess = new Mess();
                 mess.setType("notification");
@@ -613,32 +546,135 @@ public class ChatGroupActivity extends AppCompatActivity {
             }
         });
 
-        layout_call.setOnClickListener(new View.OnClickListener() {
+        add_user.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (isFirstMess) {
-                    MyToast.show(ChatGroupActivity.this, "Bạn chưa thể thực hiện cuộc gọi", 0);
-                } else {
-                    reference.child("Users").child(theirUser.getPhoneNumber()).child("isCall").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                openDialogAddFriend();
+            }
+        });
+    }
+
+
+    private void openDialogAddFriend() {
+        final Dialog dialog = new Dialog(ChatGroupActivity.this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setCancelable(true);
+        dialog.setContentView(R.layout.custom_dialog_add_friend);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        ImageView avatar_result = dialog.findViewById(R.id.avatar_result);
+        EditText phone_number = dialog.findViewById(R.id.phone_number);
+        TextView name_result = dialog.findViewById(R.id.name_result);
+        CardView yes_add_friend = dialog.findViewById(R.id.yes_add_friend);
+        CardView no_add_friend = dialog.findViewById(R.id.no_add_friend);
+        RelativeLayout result_search = dialog.findViewById(R.id.result_search);
+
+        phone_number.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                String validNumber = "^[+|0]{1}[0-9]{9,11}$";
+                String search_phone = charSequence.toString().trim();
+                if (search_phone.length() > 0) {
+                    if (search_phone.charAt(0) != '+') {
+                        search_phone = "+84" + search_phone.substring(1);
+                    }
+                }
+                if (search_phone.matches(validNumber)) {
+                    reference.child("Users").child(search_phone).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                         @Override
                         public void onComplete(@NonNull Task<DataSnapshot> task) {
-                            reference.child("Users").child(user.getPhoneNumber()).child("isCall").setValue(user.getPhoneNumber());
                             if (task.getResult().exists()) {
-                                MyToast.show(ChatGroupActivity.this, theirUser.getUserName() + " đang thực hiện cuộc gọi", 0);
-                                reference.child("Users").child(user.getPhoneNumber()).child("isCall").setValue(null);
+                                User user = task.getResult().getValue(User.class);
+                                name_result.setText(user.getUserName());
+                                if (!"null".equals(user.getUserAvatar())) {
+                                    Glide.with(ChatGroupActivity.this)
+                                            .load(user.getUserAvatar())
+                                            .centerInside()
+//                                            .rotate(90)
+                                            .error(R.drawable.profile)
+                                            .placeholder(R.drawable.profile)
+                                            .into(avatar_result);
+                                } else {
+                                    avatar_result.setImageDrawable(ChatGroupActivity.this.getDrawable(R.drawable.profile));
+                                }
+                                result_search.setVisibility(View.VISIBLE);
                             } else {
-                                reference.child("Users").child(theirUser.getPhoneNumber()).child("isCall").setValue(user.getPhoneNumber());
-                                Intent intent = new Intent(ChatGroupActivity.this, VoiceCallActivity.class);
-                                intent.putExtra("user", user);
-                                intent.putExtra("theirUser", theirUser);
-                                startActivityForResult(intent, 110011);
+                                result_search.setVisibility(View.GONE);
                             }
                         }
                     });
 
+                } else {
+                    result_search.setVisibility(View.GONE);
                 }
             }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
         });
+        no_add_friend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+        yes_add_friend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String search_phone = phone_number.getText().toString().trim();
+                if (search_phone.length() > 0) {
+                    if (search_phone.charAt(0) != '+') {
+                        search_phone = "+84" + search_phone.substring(1);
+                    }
+                }
+                String finalSearch_phone = search_phone;
+                reference.child("Rooms").child(roomID).child("listSeen").child(search_phone).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DataSnapshot> task) {
+                        if(task.getResult().exists()) {
+                            MyToast.show(ChatGroupActivity.this, "Người này hiện đang ở trong nhóm", 0);
+                        } else {
+                            String time = String.valueOf(System.currentTimeMillis());
+                            Mess mess = new Mess();
+                            mess.setMessage("4__@__" + finalSearch_phone);
+                            mess.setTime(time);
+                            mess.setType("notification");
+                            mess.setUserId(user.getPhoneNumber());
+                            reference.child("Rooms").child(roomID).child("listMess").child(time).setValue(mess);
+                            reference.child("Rooms").child(roomID).child("listSeen").child(user.getPhoneNumber()).child("is").setValue(true);
+                            Room room = new Room();
+                            room.setRoomID(roomID);
+                            room.setRoomType("group");
+                            room.setLastMess(User.getInstance().getUserName() + " đã thêm thành viên");
+                            room.setLastMessId(user.getPhoneNumber());
+                            room.setRoomTimeLastMess(time);
+                            reference.child("Users").child(user.getPhoneNumber()).child("rooms").child(roomID).setValue(room);
+                            listUser.add(finalSearch_phone);
+                            for (String user_phone : listUser) {
+                                reference.child("Rooms").child(roomID).child("listSeen").child(user_phone).child("is").setValue(false);
+                                reference.child("Rooms").child(roomID).child("roomName").setValue(binding.textName.getText().toString().trim());
+                                reference.child("Rooms").child(roomID).child("imageRoom").setValue("null");
+                                reference.child("Users").child(user_phone).child("rooms").child(roomID).setValue(room).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if(dialog.isShowing()) {
+                                            dialog.dismiss();
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    }
+                });
+            }
+        });
+        dialog.show();
     }
 
     Uri uri;
@@ -860,33 +896,11 @@ public class ChatGroupActivity extends AppCompatActivity {
             mess.setType("video");
         }
 
-        if (isFirstMess) {
-            Room room = new Room();
-            room.setRoomType("chat");
-            room.setRoomID(time_now);
-            room.setRoomName(theirUser.getUserName());
-            reference.child("Users").child(user.getPhoneNumber()).child("rooms").child(theirUser.getPhoneNumber()).setValue(room);
-            room.setRoomName(user.getUserName());
-            reference.child("Users").child(theirUser.getPhoneNumber()).child("rooms").child(user.getPhoneNumber()).setValue(room);
 
-            if (isImage) {
-                firstMess(room, "Đã gửi một ảnh", time_now, mess);
-            } else {
-                firstMess(room, "Đã gửi một video", time_now, mess);
-            }
-
-            isFirstMess = false;
-            chat_room.setRoomID(time_now);
-            eventChat();
+        if (isImage) {
+            nextMess(time_now, "Đã gửi một ảnh", mess);
         } else {
-            if (isImage) {
-                SendNotification.send(ChatGroupActivity.this, theirUser.getToken(), user.getUserName(), mess.getMessage(), user.getPhoneNumber(), mess.getType(), user.getUserAvatar(), false);
-                nextMess(time_now, "Đã gửi một ảnh", mess);
-            } else {
-                SendNotification.send(ChatGroupActivity.this, theirUser.getToken(), user.getUserName(), "Đã gửi một video", user.getPhoneNumber(), mess.getType(), user.getUserAvatar(), false);
-                nextMess(time_now, "Đã gửi một video", mess);
-            }
-
+            nextMess(time_now, "Đã gửi một video", mess);
         }
         offKeyboard();
     }
@@ -922,25 +936,8 @@ public class ChatGroupActivity extends AppCompatActivity {
         mess.setTime(time_now);
         mess.setUserId(user.getPhoneNumber());
         mess.setType("icon");
-        if (isFirstMess) {
-            Room room = new Room();
-            room.setRoomType("chat");
-            room.setRoomID(time_now);
-            room.setRoomName(theirUser.getUserName());
-            reference.child("Users").child(user.getPhoneNumber()).child("rooms").child(theirUser.getPhoneNumber()).setValue(room);
-            room.setRoomName(user.getUserName());
-            reference.child("Users").child(theirUser.getPhoneNumber()).child("rooms").child(user.getPhoneNumber()).setValue(room);
-
-            firstMess(room, "Đã gửi một biểu cảm", time_now, mess);
-            isFirstMess = false;
-            chat_room.setRoomID(time_now);
-            eventChat();
-        } else {
-            SendNotification.send(ChatGroupActivity.this, theirUser.getToken(), user.getUserName(), "Đã gửi một biểu cảm", user.getPhoneNumber(), mess.getType(), user.getUserAvatar(), false);
-            nextMess(time_now, "Đã gửi một biểu cảm", mess);
-        }
+        nextMess(time_now, "Đã gửi một biểu cảm", mess);
         offKeyboard();
-
     }
 
 
@@ -964,55 +961,25 @@ public class ChatGroupActivity extends AppCompatActivity {
         mess.setTime(time_now);
         mess.setUserId(user.getPhoneNumber());
         mess.setType(type);
-        if (isFirstMess) {
-            Room room = new Room();
-            room.setRoomType("chat");
-            room.setRoomID(time_now);
-            room.setRoomName(theirUser.getUserName());
-            reference.child("Users").child(user.getPhoneNumber()).child("rooms").child(theirUser.getPhoneNumber()).setValue(room);
-            room.setRoomName(user.getUserName());
-            reference.child("Users").child(theirUser.getPhoneNumber()).child("rooms").child(user.getPhoneNumber()).setValue(room);
-
-            firstMess(room, mess_content, time_now, mess);
-
-            isFirstMess = false;
-            chat_room.setRoomID(time_now);
-            eventChat();
-        } else {
-            SendNotification.send(ChatGroupActivity.this, theirUser.getToken(), user.getUserName(), mess_content, user.getPhoneNumber(), mess.getType(), user.getUserAvatar(), false);
-            nextMess(time_now, mess_content, mess);
-        }
+        nextMess(time_now, mess_content, mess);
         binding.inputMessage.setText("");
         offKeyboard();
     }
 
-    private void firstMess(Room room, String mess_content, String time_now, Mess mess) {
-//        reference.child("Rooms").child(room.getRoomID()).child("lastMess").setValue(mess_content);
-//        reference.child("Rooms").child(room.getRoomID()).child("roomTimeLastMess").setValue(time_now);
-        reference.child("Rooms").child(room.getRoomID()).child("listMess").child(time_now).setValue(mess);
-        reference.child("Rooms").child(room.getRoomID()).child("listSeen").child(user.getPhoneNumber()).child("is").setValue(true);
-        reference.child("Rooms").child(room.getRoomID()).child("listSeen").child(user.getPhoneNumber()).child("in").setValue(time_now);
-        reference.child("Rooms").child(room.getRoomID()).child("listSeen").child(theirUser.getPhoneNumber()).child("is").setValue(false);
-        reference.child("Users").child(theirUser.getPhoneNumber()).child("rooms").child(user.getPhoneNumber()).child("roomTimeLastMess").setValue(time_now);
-        reference.child("Users").child(user.getPhoneNumber()).child("rooms").child(theirUser.getPhoneNumber()).child("roomTimeLastMess").setValue(time_now);
-        reference.child("Users").child(theirUser.getPhoneNumber()).child("rooms").child(user.getPhoneNumber()).child("lastMess").setValue(mess_content);
-        reference.child("Users").child(user.getPhoneNumber()).child("rooms").child(theirUser.getPhoneNumber()).child("lastMess").setValue(mess_content);
-        reference.child("Users").child(theirUser.getPhoneNumber()).child("rooms").child(user.getPhoneNumber()).child("lastMessId").setValue(user.getPhoneNumber());
-        reference.child("Users").child(user.getPhoneNumber()).child("rooms").child(theirUser.getPhoneNumber()).child("lastMessId").setValue(user.getPhoneNumber());
-    }
-
     private void nextMess(String time_now, String mess_content, Mess mess) {
-//        reference.child("Rooms").child(chat_room.getRoomID()).child("lastMess").setValue(mess_content);
-//        reference.child("Rooms").child(chat_room.getRoomID()).child("roomTimeLastMess").setValue(time_now);
-        reference.child("Users").child(theirUser.getPhoneNumber()).child("rooms").child(user.getPhoneNumber()).child("roomTimeLastMess").setValue(time_now);
-        reference.child("Users").child(user.getPhoneNumber()).child("rooms").child(theirUser.getPhoneNumber()).child("roomTimeLastMess").setValue(time_now);
-        reference.child("Users").child(theirUser.getPhoneNumber()).child("rooms").child(user.getPhoneNumber()).child("lastMess").setValue(mess_content);
-        reference.child("Users").child(user.getPhoneNumber()).child("rooms").child(theirUser.getPhoneNumber()).child("lastMess").setValue(mess_content);
-        reference.child("Users").child(theirUser.getPhoneNumber()).child("rooms").child(user.getPhoneNumber()).child("lastMessId").setValue(user.getPhoneNumber());
-        reference.child("Users").child(user.getPhoneNumber()).child("rooms").child(theirUser.getPhoneNumber()).child("lastMessId").setValue(user.getPhoneNumber());
+        reference.child("Users").child(user.getPhoneNumber()).child("rooms").child(roomID).child("roomTimeLastMess").setValue(time_now);
+        reference.child("Users").child(user.getPhoneNumber()).child("rooms").child(roomID).child("lastMess").setValue(mess_content);
+        reference.child("Users").child(user.getPhoneNumber()).child("rooms").child(roomID).child("lastMessId").setValue(user.getPhoneNumber());
+
         reference.child("Rooms").child(chat_room.getRoomID()).child("listMess").child(time_now).setValue(mess);
         reference.child("Rooms").child(chat_room.getRoomID()).child("listSeen").child(user.getPhoneNumber()).child("is").setValue(true);
-        reference.child("Rooms").child(chat_room.getRoomID()).child("listSeen").child(user.getPhoneNumber()).child("in").setValue(time_now);
-        reference.child("Rooms").child(chat_room.getRoomID()).child("listSeen").child(theirUser.getPhoneNumber()).child("is").setValue(false);
+
+
+        for (String str : listUser) {
+            reference.child("Users").child(str).child("rooms").child(roomID).child("roomTimeLastMess").setValue(time_now);
+            reference.child("Users").child(str).child("rooms").child(roomID).child("lastMess").setValue(mess_content);
+            reference.child("Users").child(str).child("rooms").child(roomID).child("lastMessId").setValue(user.getPhoneNumber());
+            reference.child("Rooms").child(chat_room.getRoomID()).child("listSeen").child(str).child("is").setValue(false);
+        }
     }
 }

@@ -22,6 +22,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -45,6 +46,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -296,24 +302,28 @@ public class ChatActivity extends AppCompatActivity {
         }
 
         if (!theirUser.getUserAvatar().equals("null")) {
-            Picasso.get().load(theirUser.getUserAvatar()).fit().centerCrop().placeholder(ChatActivity.this.getResources().getDrawable(R.drawable.profile)).into(binding.avatar, new com.squareup.picasso.Callback() {
+            Glide.with(ChatActivity.this).load(theirUser.getUserAvatar()).centerCrop().placeholder(ChatActivity.this.getResources().getDrawable(R.drawable.profile)).listener(new RequestListener<Drawable>() {
                 @Override
-                public void onSuccess() {
+                public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                    return false;
+                }
+
+                @Override
+                public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
                     BitmapDrawable drawable = (BitmapDrawable) binding.avatar.getDrawable();
                     bitmapAvatar = drawable.getBitmap();
                     if (chat_room.getRoomID() != null) {
                         eventChat();
                     }
+                    return false;
                 }
-
-                @Override
-                public void onError(Exception e) {
-
-                }
-            });
+            }).into(binding.avatar);
         } else {
             BitmapDrawable drawable = (BitmapDrawable) binding.avatar.getDrawable();
             bitmapAvatar = drawable.getBitmap();
+            if (chat_room.getRoomID() != null) {
+                eventChat();
+            }
         }
 
         reference.child("Users").child(theirUser.getPhoneNumber()).child("status").addValueEventListener(new ValueEventListener() {
@@ -570,9 +580,9 @@ public class ChatActivity extends AppCompatActivity {
 
         if (!theirUser.getUserAvatar().equals("null")) {
 
-            Picasso.get()
+            Glide.with(ChatActivity.this)
                     .load(theirUser.getUserAvatar()) // web image url
-                    .fit().centerInside()
+                    .centerInside()
                     .error(R.drawable.profile)
                     .placeholder(R.drawable.profile)
                     .into(user_avatar);
