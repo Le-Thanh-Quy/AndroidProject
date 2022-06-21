@@ -112,7 +112,7 @@ public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
             });
         } else {
             createMess(mess, holder, position);
-            holder.their_avatar.setImageBitmap(bitmapAvatar);
+            Glide.with(context).load(theirUser.getUserAvatar()).into(holder.their_avatar);
         }
 
 

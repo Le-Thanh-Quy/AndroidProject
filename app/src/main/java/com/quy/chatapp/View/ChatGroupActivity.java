@@ -68,9 +68,14 @@ import com.quy.chatapp.databinding.ActivityChatBinding;
 import com.quy.chatapp.databinding.ActivityChatGroupBinding;
 import com.squareup.picasso.Picasso;
 
+import org.jitsi.meet.sdk.JitsiMeetActivity;
+import org.jitsi.meet.sdk.JitsiMeetConferenceOptions;
+
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -439,6 +444,24 @@ public class ChatGroupActivity extends AppCompatActivity {
                         dialog.dismiss();
                     }
                 });
+            }
+        });
+        binding.callVideo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    JitsiMeetConferenceOptions options = new JitsiMeetConferenceOptions.Builder()
+                            .setServerURL(new URL("https://meet.jit.si"))
+                            .setRoom(roomID + "chatapp")
+                            .setAudioOnly(false)
+                            .setWelcomePageEnabled(false)
+                            .setFeatureFlag("chat.ena bled",false)
+                            .setFeatureFlag("invite.enabled",false)
+                            .build();
+                    JitsiMeetActivity.launch(ChatGroupActivity.this, options);
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
