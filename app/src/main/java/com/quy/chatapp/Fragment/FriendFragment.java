@@ -25,6 +25,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
@@ -173,9 +174,9 @@ public class FriendFragment extends Fragment {
                                 User user = task.getResult().getValue(User.class);
                                 name_result.setText(user.getUserName());
                                 if (!"null".equals(user.getUserAvatar())) {
-                                    Picasso.get()
+                                    Glide.with(context)
                                             .load(user.getUserAvatar())
-                                            .fit().centerInside()
+                                            .centerInside()
 //                                            .rotate(90)
                                             .error(R.drawable.profile)
                                             .placeholder(R.drawable.profile)

@@ -20,6 +20,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
@@ -168,7 +169,7 @@ public class PushVoiceCall {
                                 User theirUser = task.getResult().getValue(User.class);
                                 assert theirUser != null;
                                 name.setText(theirUser.getUserName());
-                                Picasso.get().load(theirUser.getUserAvatar()).placeholder(R.drawable.profile).into(avatar);
+                                Glide.with(context).load(theirUser.getUserAvatar()).placeholder(R.drawable.profile).into(avatar);
                             }
                         });
                     } else {

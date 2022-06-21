@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:background="#7E000000"
+    android:layout_height="match_parent">
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_marginHorizontal="15dp"
+        android:layout_marginVertical="20dp"
+        app:cardCornerRadius="20dp"
+        android:layout_height="match_parent">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:background="@color/white"
+            android:layout_height="match_parent">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:id="@+id/topBar"
+                android:layout_height="50dp">
+
+                <ImageView
+                    android:id="@+id/cancel"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="15dp"
+                    android:src="@drawable/ic_back"
+                    app:tint="@color/black" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="20dp"
+                    android:layout_toEndOf="@+id/cancel"
+                    android:fontFamily="sans-serif-black"
+                    android:text="Nhóm chat mới"
+                    android:textColor="@color/black"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/create_chat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="20dp"
+                    android:fontFamily="sans-serif-black"
+                    android:text="Tạo"
+                    android:textColor="#C8C8C8"
+                    android:textSize="22sp" />
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/label_for_edit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/topBar"
+                android:layout_marginTop="40dp"
+                android:fontFamily="sans-serif-black"
+                android:text="Đặt tên đoạn chat mới"
+                android:textAlignment="center"
+                android:textColor="@color/black"
+                android:textSize="22sp" />
+
+            <EditText
+                android:id="@+id/name_chat"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_below="@+id/label_for_edit"
+                android:layout_marginHorizontal="15dp"
+                android:layout_marginTop="0dp"
+                android:fontFamily="sans-serif-black"
+                android:hint="Tên nhóm (Bắt buộc)"
+                android:imeOptions="actionDone"
+                android:inputType="text"
+                android:maxLength="40"
+                android:paddingHorizontal="10dp"
+                android:textColor="@color/black" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/list_friend"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/name_chat"
+                android:layout_marginTop="20dp" />
+
+            <ImageView
+                android:id="@+id/not_found"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_centerInParent="true"
+                android:visibility="gone"
+                android:src="@drawable/conversation_person" />
+
+            <ProgressBar
+                android:id="@+id/load_fragment"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_centerInParent="true"
+                android:layout_marginTop="100dp"
+                android:foregroundTint="@color/black"
+                android:indeterminateTint="@color/black"
+                android:indeterminateTintMode="src_atop" />
+        </RelativeLayout>
+    </androidx.cardview.widget.CardView>
+
+</RelativeLayout>

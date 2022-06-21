@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -83,9 +84,9 @@ public class ListUserOnline extends RecyclerView.Adapter<ListUserOnline.viewHold
         });
         holder.userName.setText(user.getUserName());
         if (!"null".equals(user.getUserAvatar())) {
-            Picasso.get()
+            Glide.with(context)
                     .load(user.getUserAvatar()) // web image url
-                    .fit().centerInside()
+                    .centerInside()
 //                    .rotate(90)                    //if you want to rotate by 90 degrees
                     .error(R.drawable.profile)
                     .placeholder(R.drawable.profile)

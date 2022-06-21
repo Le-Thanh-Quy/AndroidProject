@@ -22,6 +22,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -45,6 +46,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -296,24 +302,28 @@ public class ChatActivity extends AppCompatActivity {
         }
 
         if (!theirUser.getUserAvatar().equals("null")) {
-            Picasso.get().load(theirUser.getUserAvatar()).fit().centerCrop().placeholder(ChatActivity.this.getResources().getDrawable(R.drawable.profile)).into(binding.avatar, new com.squareup.picasso.Callback() {
+            Glide.with(ChatActivity.this).load(theirUser.getUserAvatar()).centerCrop().placeholder(ChatActivity.this.getResources().getDrawable(R.drawable.profile)).listener(new RequestListener<Drawable>() {
                 @Override
-                public void onSuccess() {
+                public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                    return false;
+                }
+
+                @Override
+                public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
                     BitmapDrawable drawable = (BitmapDrawable) binding.avatar.getDrawable();
                     bitmapAvatar = drawable.getBitmap();
                     if (chat_room.getRoomID() != null) {
                         eventChat();
                     }
+                    return false;
                 }
-
-                @Override
-                public void onError(Exception e) {
-
-                }
-            });
+            }).into(binding.avatar);
         } else {
             BitmapDrawable drawable = (BitmapDrawable) binding.avatar.getDrawable();
             bitmapAvatar = drawable.getBitmap();
+            if (chat_room.getRoomID() != null) {
+                eventChat();
+            }
         }
 
         reference.child("Users").child(theirUser.getPhoneNumber()).child("status").addValueEventListener(new ValueEventListener() {
@@ -542,7 +552,7 @@ public class ChatActivity extends AppCompatActivity {
     TextView user_name;
     Dialog dialog;
     RelativeLayout layout_icon;
-    CardView layout_call, layout_video;
+    CardView layout_call, layout_video, layout_add_avatar;
 
     void openUserInfo() {
         dialog = new Dialog(ChatActivity.this, R.style.Dialogs);
@@ -555,7 +565,8 @@ public class ChatActivity extends AppCompatActivity {
         icon_chat = dialog.findViewById(R.id.icon_chat);
         layout_icon = dialog.findViewById(R.id.layout_icon);
         layout_call = dialog.findViewById(R.id.layout_call);
-
+        layout_add_avatar = dialog.findViewById(R.id.layout_add_avatar);
+        layout_add_avatar.setVisibility(View.GONE);
         et_name.setText(chat_room.getRoomName());
         user_name.setText(theirUser.getUserName());
         if (chat_room.getIconId() != null) {
@@ -570,9 +581,9 @@ public class ChatActivity extends AppCompatActivity {
 
         if (!theirUser.getUserAvatar().equals("null")) {
 
-            Picasso.get()
+            Glide.with(ChatActivity.this)
                     .load(theirUser.getUserAvatar()) // web image url
-                    .fit().centerInside()
+                    .centerInside()
                     .error(R.drawable.profile)
                     .placeholder(R.drawable.profile)
                     .into(user_avatar);
@@ -902,10 +913,10 @@ public class ChatActivity extends AppCompatActivity {
             eventChat();
         } else {
             if (isImage) {
-                SendNotification.send(ChatActivity.this, theirUser.getToken(), user.getUserName(), mess.getMessage(), user.getPhoneNumber(), mess.getType(), user.getUserAvatar());
+                SendNotification.send(ChatActivity.this, theirUser.getToken(), user.getUserName(), mess.getMessage(), user.getPhoneNumber(), mess.getType(), user.getUserAvatar(), false);
                 nextMess(time_now, "Đã gửi một ảnh", mess);
             } else {
-                SendNotification.send(ChatActivity.this, theirUser.getToken(), user.getUserName(), "Đã gửi một video", user.getPhoneNumber(), mess.getType(), user.getUserAvatar());
+                SendNotification.send(ChatActivity.this, theirUser.getToken(), user.getUserName(), "Đã gửi một video", user.getPhoneNumber(), mess.getType(), user.getUserAvatar(), false);
                 nextMess(time_now, "Đã gửi một video", mess);
             }
 
@@ -958,7 +969,7 @@ public class ChatActivity extends AppCompatActivity {
             chat_room.setRoomID(time_now);
             eventChat();
         } else {
-            SendNotification.send(ChatActivity.this, theirUser.getToken(), user.getUserName(), "Đã gửi một biểu cảm", user.getPhoneNumber(), mess.getType(), user.getUserAvatar());
+            SendNotification.send(ChatActivity.this, theirUser.getToken(), user.getUserName(), "Đã gửi một biểu cảm", user.getPhoneNumber(), mess.getType(), user.getUserAvatar(), false);
             nextMess(time_now, "Đã gửi một biểu cảm", mess);
         }
         offKeyboard();
@@ -1001,7 +1012,7 @@ public class ChatActivity extends AppCompatActivity {
             chat_room.setRoomID(time_now);
             eventChat();
         } else {
-            SendNotification.send(ChatActivity.this, theirUser.getToken(), user.getUserName(), mess_content, user.getPhoneNumber(), mess.getType(), user.getUserAvatar());
+            SendNotification.send(ChatActivity.this, theirUser.getToken(), user.getUserName(), mess_content, user.getPhoneNumber(), mess.getType(), user.getUserAvatar(), false);
             nextMess(time_now, mess_content, mess);
         }
         binding.inputMessage.setText("");
