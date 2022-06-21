@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#34000000"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center|center_horizontal"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginVertical="15dp"
+        android:background="@drawable/profile_background"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/edit_avatar"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignBottom="@+id/add_avatar"
+            android:layout_marginStart="10dp"
+            android:layout_marginBottom="0dp"
+            android:layout_toEndOf="@+id/add_avatar"
+            android:src="@drawable/edit"
+            android:visibility="invisible" />
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/layout_avatar"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30dp"
+            app:cardCornerRadius="100dp">
+
+            <ImageView
+                android:id="@+id/user_avatar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/profile" />
+        </androidx.cardview.widget.CardView>
+
+
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/add_avatar"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_below="@+id/layout_avatar"
+            android:layout_alignEnd="@+id/layout_avatar"
+            android:layout_marginTop="-45dp"
+            android:layout_marginEnd="0dp"
+            android:backgroundTint="#CBF6D7"
+            app:cardCornerRadius="100dp">
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:src="@drawable/add_avatar" />
+        </androidx.cardview.widget.CardView>
+
+        <TextView
+            android:id="@+id/user_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/layout_avatar"
+            android:layout_marginTop="10dp"
+            android:fontFamily="sans-serif-black"
+            android:text="Lê Thanh Quý"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="30sp" />
+
+        <RelativeLayout
+            android:id="@+id/layout_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/user_name"
+            android:layout_marginHorizontal="15dp"
+            android:layout_marginTop="40dp">
+
+            <TextView
+                android:id="@+id/title_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-black"
+                android:text="Họ tên:"
+                android:textColor="@color/black"
+                android:textSize="22sp" />
+
+            <EditText
+                android:id="@+id/et_name"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_below="@+id/title_name"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/profile_input"
+                android:fontFamily="sans-serif-black"
+                android:maxLength="25"
+                android:padding="10dp"
+                android:singleLine="true"
+                android:text="Lê Thanh Quý"
+                android:textColor="@color/black"
+                android:textSize="22sp" />
+
+            <ImageView
+                android:id="@+id/edit_name"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_below="@+id/et_name"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="-50dp"
+                android:layout_marginEnd="5dp"
+                android:src="@drawable/edit"
+                android:visibility="invisible" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/layout_phone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/layout_name"
+            android:layout_marginHorizontal="15dp"
+            android:layout_marginTop="20dp">
+
+            <TextView
+                android:id="@+id/title_phone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-black"
+                android:text="Số điện thoại:"
+                android:textColor="@color/black"
+                android:textSize="22sp" />
+
+            <EditText
+                android:id="@+id/et_phone"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_below="@+id/title_phone"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/profile_input"
+                android:editable="false"
+                android:enabled="false"
+                android:fontFamily="sans-serif-black"
+                android:padding="10dp"
+                android:text="038493379"
+                android:textColor="@color/black"
+                android:textSize="22sp" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/layout_pass"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/layout_phone"
+            android:layout_marginHorizontal="15dp"
+            android:layout_marginTop="20dp">
+
+            <TextView
+                android:id="@+id/title_pass"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-black"
+                android:text="Mật khẩu:"
+                android:textColor="@color/black"
+                android:textSize="22sp" />
+
+            <EditText
+                android:id="@+id/et_pass"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_below="@+id/title_pass"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/profile_input"
+                android:fontFamily="sans-serif-black"
+                android:inputType="textPassword"
+                android:maxLength="15"
+                android:padding="10dp"
+                android:singleLine="true"
+                android:text="123123"
+                android:textColor="@color/black"
+                android:textSize="22sp" />
+
+            <ImageView
+                android:id="@+id/edit_pass"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_below="@+id/et_pass"
+                android:visibility="invisible"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="-50dp"
+                android:layout_marginEnd="5dp"
+                android:src="@drawable/edit" />
+        </RelativeLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_logout"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginHorizontal="15dp"
+            android:layout_marginBottom="10dp"
+            android:backgroundTint="#192497"
+            android:fontFamily="sans-serif-black"
+            android:text="Logout"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            app:cornerRadius="15dp" />
+
+        <ImageView
+            android:id="@+id/close_profile"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="10dp"
+            android:src="@drawable/close" />
+    </RelativeLayout>
+
+</LinearLayout>

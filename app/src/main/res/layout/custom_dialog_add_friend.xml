@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+    <LinearLayout
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/phone_number"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/border_input"
+            android:fontFamily="sans-serif-black"
+            android:hint="Enter a phone number..."
+            android:inputType="phone"
+            android:maxLength="12"
+            android:imeOptions="actionDone"
+            android:padding="13dp"
+            android:textColor="@color/black"
+            android:textFontWeight="500"
+            android:textSize="18sp" />
+
+        <RelativeLayout
+            android:id="@+id/result_search"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:paddingTop="20dp"
+            android:background="@drawable/border_input"
+            android:layout_marginHorizontal="10dp"
+            android:visibility="gone">
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/avatarLayout"
+                android:layout_width="55dp"
+                android:layout_height="55dp"
+                android:layout_centerHorizontal="true"
+                app:cardCornerRadius="100dp">
+
+                <ImageView
+                    android:id="@+id/avatar_result"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/profile" />
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:id="@+id/name_result"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/avatarLayout"
+                android:layout_marginTop="10dp"
+                android:fontFamily="sans-serif-black"
+                android:singleLine="true"
+                android:text="Lê Thanh Quý"
+                android:textAlignment="center"
+                android:textColor="@color/black"
+                android:textSize="20sp" />
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/yes_add_friend"
+                android:layout_width="55dp"
+                android:layout_height="55dp"
+                android:layout_alignParentBottom="true"
+                android:layout_marginStart="35dp"
+                android:layout_marginBottom="15dp"
+                android:layout_toEndOf="@+id/center_space"
+                android:backgroundTint="#3BCC19"
+                app:cardCornerRadius="100dp">
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/yes"
+                    app:tint="@color/white" />
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/no_add_friend"
+                android:layout_width="55dp"
+                android:layout_height="55dp"
+                android:layout_alignParentBottom="true"
+                android:layout_marginEnd="35dp"
+                android:layout_marginBottom="15dp"
+                android:layout_toStartOf="@+id/center_space"
+                android:backgroundTint="#EF1D1D"
+                app:cardCornerRadius="100dp">
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/no"
+                    app:tint="@color/white" />
+            </androidx.cardview.widget.CardView>
+
+            <Space
+                android:id="@+id/center_space"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_centerHorizontal="true" />
+        </RelativeLayout>
+    </LinearLayout>
+</RelativeLayout>

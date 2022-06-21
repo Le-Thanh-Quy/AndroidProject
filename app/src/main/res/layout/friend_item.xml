@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="10dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal">
+    <androidx.cardview.widget.CardView
+        android:id="@+id/layoutAvatar"
+        android:layout_width="wrap_content"
+
+        app:cardCornerRadius="100dp"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/friendAvatar"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/profile"/>
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/friendStatus"
+        android:layout_width="15dp"
+        android:backgroundTint="#5FD364"
+        app:cardCornerRadius="100dp"
+        android:layout_height="15dp"
+        android:layout_below="@+id/layoutAvatar"
+        android:layout_alignEnd="@+id/layoutAvatar"
+        android:layout_marginTop="-15dp"
+        android:layout_marginEnd="0dp">
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/timeStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="15dp"
+        android:layout_below="@+id/layoutAvatar"
+        android:layout_marginStart="-27dp"
+        android:layout_marginTop="-15dp"
+        android:layout_toEndOf="@+id/layoutAvatar"
+        android:visibility="gone"
+        android:backgroundTint="#CFEFD0"
+        app:cardCornerRadius="20dp">
+
+        <TextView
+            android:id="@+id/time_status_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:fontFamily="sans-serif-black"
+            android:gravity="center"
+            android:paddingHorizontal="5dp"
+            android:text="20 phút"
+            android:textColor="#000000"
+            android:textSize="8sp" />
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/friendName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:layout_toEndOf="@+id/layoutAvatar"
+        android:fontFamily="sans-serif-black"
+        android:maxLines="2"
+        android:text="Lê Thanh Quý"
+        android:layout_centerVertical="true"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textFontWeight="500"
+        android:textSize="16sp" />
+
+
+
+
+</RelativeLayout>
