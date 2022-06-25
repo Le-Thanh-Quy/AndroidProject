@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -51,6 +52,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -68,9 +70,20 @@ import com.quy.chatapp.databinding.ActivityChatBinding;
 import com.quy.chatapp.databinding.ActivityChatGroupBinding;
 import com.squareup.picasso.Picasso;
 
+import org.jitsi.meet.sdk.JitsiMeet;
+import org.jitsi.meet.sdk.JitsiMeetActivity;
+import org.jitsi.meet.sdk.JitsiMeetActivityDelegate;
+import org.jitsi.meet.sdk.JitsiMeetConferenceOptions;
+import org.jitsi.meet.sdk.JitsiMeetUserInfo;
+import org.jitsi.meet.sdk.JitsiMeetView;
+import org.jitsi.meet.sdk.JitsiMeetViewListener;
+import org.jitsi.meet.sdk.log.JitsiMeetBaseLogHandler;
+
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -96,7 +109,7 @@ public class ChatGroupActivity extends AppCompatActivity {
     FirebaseStorage firebaseStorage;
     StorageReference storageReference;
     boolean isNotification = false;
-    ArrayList<String> listUser;
+    ArrayList<User> listUser;
 
 
     @Override
@@ -156,13 +169,18 @@ public class ChatGroupActivity extends AppCompatActivity {
                         public void onComplete(@NonNull Task<DataSnapshot> task) {
                             for (DataSnapshot dataSnapshot : task.getResult().getChildren()) {
                                 String phoneNumber = dataSnapshot.getKey();
-                                listUser.add(phoneNumber);
+                                User theirUser = new User();
+                                theirUser.setPhoneNumber(phoneNumber);
+                                String token = dataSnapshot.child("token").getValue(String.class);
+                                theirUser.setToken(token);
+                                listUser.add(theirUser);
                             }
                             uiEvent();
                             loadPage();
                             eventChat();
                             sendMessEvent();
                             sendIconEvent();
+                            getToken();
                             binding.userOnline.setVisibility(View.GONE);
                         }
                     });
@@ -176,7 +194,26 @@ public class ChatGroupActivity extends AppCompatActivity {
 
             }
         });
+        PushVoiceCall.context = ChatGroupActivity.this;
+        PushVoiceCall.activity = ChatGroupActivity.this;
+    }
 
+    private void getToken() {
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(new OnCompleteListener<String>() {
+                    @Override
+                    public void onComplete(@NonNull Task<String> task) {
+                        if (!task.isSuccessful()) {
+                            Intent intent = new Intent(ChatGroupActivity.this, MainActivity.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(intent);
+                            finishAndRemoveTask();
+                            return;
+                        }
+                        String token = task.getResult();
+                        reference.child("Rooms").child(roomID).child("listSeen").child(user.getPhoneNumber()).child("token").setValue(token);
+                    }
+                });
     }
 
     @Override
@@ -209,8 +246,34 @@ public class ChatGroupActivity extends AppCompatActivity {
         super.onPause();
     }
 
+    boolean isJoinVideoCall = false;
+
     @Override
     protected void onResume() {
+        if (isJoinVideoCall) {
+            reference.child("Rooms").child(roomID).child("videoCallMember").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DataSnapshot> task) {
+                    int videoCallMember = Integer.parseInt(task.getResult().getValue().toString());
+                    reference.child("Rooms").child(roomID).child("videoCallMember").setValue(videoCallMember - 1);
+                    isJoinVideoCall = false;
+                    String time_now = String.valueOf(System.currentTimeMillis());
+                    Mess mess = new Mess();
+                    mess.setType("notification");
+                    mess.setUserId(user.getPhoneNumber());
+                    mess.setTime(time_now);
+                    if ((videoCallMember - 1) <= 0) {
+                        mess.setMessage("8__@__");
+                        reference.child("Rooms").child(roomID).child("isVideoCall").setValue(false);
+                    } else {
+                        mess.setMessage("7__@__");
+                    }
+                    reference.child("Rooms").child(chat_room.getRoomID()).child("listMess").child(time_now).setValue(mess);
+
+                }
+            });
+
+        }
         MainActivity.id_user = roomID;
         isSeen = true;
         reference.child("Users").child(user.getPhoneNumber()).child("status").child("is").setValue(true);
@@ -294,21 +357,25 @@ public class ChatGroupActivity extends AppCompatActivity {
     private void loadPage() {
         binding.textName.setText(chat_room.getRoomName());
         if (!chat_room.getImageRoom().equals("null")) {
-            Glide.with(ChatGroupActivity.this).load(chat_room.getImageRoom()).centerCrop().placeholder(ChatGroupActivity.this.getResources().getDrawable(R.drawable.team)).listener(new RequestListener<Drawable>() {
-                @Override
-                public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                    return false;
-                }
+            try {
+                Glide.with(ChatGroupActivity.this).load(chat_room.getImageRoom()).centerCrop().placeholder(ContextCompat.getDrawable(ChatGroupActivity.this, R.drawable.team)).listener(new RequestListener<Drawable>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                        return false;
+                    }
 
-                @Override
-                public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                    BitmapDrawable drawable = (BitmapDrawable) binding.avatar.getDrawable();
-                    bitmapAvatar = drawable.getBitmap();
-                    return false;
-                }
-            }).into(binding.avatar);
+                    @Override
+                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                        BitmapDrawable drawable = (BitmapDrawable) binding.avatar.getDrawable();
+                        bitmapAvatar = drawable.getBitmap();
+                        return false;
+                    }
+                }).into(binding.avatar);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         } else {
-            binding.avatar.setImageDrawable(getDrawable(R.drawable.team));
+            binding.avatar.setImageDrawable(ContextCompat.getDrawable(ChatGroupActivity.this, R.drawable.team));
             BitmapDrawable drawable = (BitmapDrawable) binding.avatar.getDrawable();
             bitmapAvatar = drawable.getBitmap();
         }
@@ -441,6 +508,58 @@ public class ChatGroupActivity extends AppCompatActivity {
                 });
             }
         });
+        binding.callVideo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                reference.child("Rooms").child(roomID).child("isVideoCall").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DataSnapshot> task) {
+                        if (Boolean.TRUE.equals(task.getResult().getValue(Boolean.class))) {
+                            String time_now = String.valueOf(System.currentTimeMillis());
+                            Mess mess = new Mess();
+                            mess.setType("notification");
+                            mess.setUserId(user.getPhoneNumber());
+                            mess.setTime(time_now);
+                            mess.setMessage("6__@__");
+                            reference.child("Rooms").child(chat_room.getRoomID()).child("listMess").child(time_now).setValue(mess);
+                        } else {
+                            reference.child("Rooms").child(roomID).child("isVideoCall").setValue(true);
+                            reference.child("Rooms").child(roomID).child("videoCallMember").setValue(0);
+                            sendMess("Bắt đầu chat video", "video_call");
+                        }
+                        reference.child("Rooms").child(roomID).child("videoCallMember").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                                int videoCallMember = 0;
+                                if (task.getResult().exists()) {
+                                    videoCallMember = Integer.parseInt(task.getResult().getValue().toString());
+                                }
+                                reference.child("Rooms").child(roomID).child("videoCallMember").setValue(videoCallMember + 1);
+                                isJoinVideoCall = true;
+                                try {
+                                    JitsiMeetUserInfo userInfo = new JitsiMeetUserInfo();
+                                    userInfo.setDisplayName(user.getUserName());
+                                    userInfo.setAvatar(new URL(user.getUserAvatar()));
+                                    JitsiMeetConferenceOptions options = new JitsiMeetConferenceOptions.Builder()
+                                            .setServerURL(new URL("https://meet.jit.si"))
+                                            .setRoom(roomID + "chatapp")
+                                            .setAudioOnly(false)
+                                            .setUserInfo(userInfo)
+                                            .setWelcomePageEnabled(false)
+                                            .setFeatureFlag("chat.ena bled", false)
+                                            .setFeatureFlag("invite.enabled", false)
+                                            .build();
+                                    JitsiMeetActivity.launch(ChatGroupActivity.this, options);
+                                } catch (
+                                        Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        });
     }
 
     ImageView close_chat_info, user_avatar, edit_name, icon_chat;
@@ -463,13 +582,14 @@ public class ChatGroupActivity extends AppCompatActivity {
         layout_call = dialog.findViewById(R.id.layout_call);
         add_user = dialog.findViewById(R.id.add_user);
         layout_add_avatar = dialog.findViewById(R.id.layout_add_avatar);
+        layout_video = dialog.findViewById(R.id.layout_video);
 
 
         add_user.setVisibility(View.VISIBLE);
         TextView textView = dialog.findViewById(R.id.title_name);
         textView.setText("Tên nhóm:");
 
-        user_avatar.setImageDrawable(getDrawable(R.drawable.team));
+        user_avatar.setImageDrawable(ContextCompat.getDrawable(ChatGroupActivity.this, R.drawable.team));
         et_name.setText(chat_room.getRoomName());
         user_name.setText(chat_room.getRoomName());
         if (chat_room.getIconId() != null) {
@@ -595,6 +715,58 @@ public class ChatGroupActivity extends AppCompatActivity {
                 });
             }
         });
+        layout_video.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                reference.child("Rooms").child(roomID).child("isVideoCall").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DataSnapshot> task) {
+                        if (Boolean.TRUE.equals(task.getResult().getValue(Boolean.class))) {
+                            String time_now = String.valueOf(System.currentTimeMillis());
+                            Mess mess = new Mess();
+                            mess.setType("notification");
+                            mess.setUserId(user.getPhoneNumber());
+                            mess.setTime(time_now);
+                            mess.setMessage("6__@__");
+                            reference.child("Rooms").child(chat_room.getRoomID()).child("listMess").child(time_now).setValue(mess);
+                        } else {
+                            reference.child("Rooms").child(roomID).child("isVideoCall").setValue(true);
+                            reference.child("Rooms").child(roomID).child("videoCallMember").setValue(0);
+                            sendMess("Bắt đầu chat video", "video_call");
+                        }
+                        reference.child("Rooms").child(roomID).child("videoCallMember").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                                int videoCallMember = 0;
+                                if (task.getResult().exists()) {
+                                    videoCallMember = Integer.parseInt(task.getResult().getValue().toString());
+                                }
+                                reference.child("Rooms").child(roomID).child("videoCallMember").setValue(videoCallMember + 1);
+                                isJoinVideoCall = true;
+                                try {
+                                    JitsiMeetUserInfo userInfo = new JitsiMeetUserInfo();
+                                    userInfo.setDisplayName(user.getUserName());
+                                    userInfo.setAvatar(new URL(user.getUserAvatar()));
+                                    JitsiMeetConferenceOptions options = new JitsiMeetConferenceOptions.Builder()
+                                            .setServerURL(new URL("https://meet.jit.si"))
+                                            .setRoom(roomID + "chatapp")
+                                            .setAudioOnly(false)
+                                            .setUserInfo(userInfo)
+                                            .setWelcomePageEnabled(false)
+                                            .setFeatureFlag("chat.ena bled", false)
+                                            .setFeatureFlag("invite.enabled", false)
+                                            .build();
+                                    JitsiMeetActivity.launch(ChatGroupActivity.this, options);
+                                } catch (
+                                        Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        });
     }
 
 
@@ -611,6 +783,7 @@ public class ChatGroupActivity extends AppCompatActivity {
         CardView yes_add_friend = dialog.findViewById(R.id.yes_add_friend);
         CardView no_add_friend = dialog.findViewById(R.id.no_add_friend);
         RelativeLayout result_search = dialog.findViewById(R.id.result_search);
+        final String[] token = {""};
 
         phone_number.addTextChangedListener(new TextWatcher() {
             @Override
@@ -632,15 +805,22 @@ public class ChatGroupActivity extends AppCompatActivity {
                         public void onComplete(@NonNull Task<DataSnapshot> task) {
                             if (task.getResult().exists()) {
                                 User user = task.getResult().getValue(User.class);
+                                assert user != null;
+                                token[0] = user.getToken();
                                 name_result.setText(user.getUserName());
                                 if (!"null".equals(user.getUserAvatar())) {
-                                    Glide.with(ChatGroupActivity.this)
-                                            .load(user.getUserAvatar())
-                                            .centerInside()
+                                    try {
+                                        Glide.with(ChatGroupActivity.this)
+                                                .load(user.getUserAvatar())
+                                                .centerInside()
 //                                            .rotate(90)
-                                            .error(R.drawable.profile)
-                                            .placeholder(R.drawable.profile)
-                                            .into(avatar_result);
+                                                .error(R.drawable.profile)
+                                                .placeholder(R.drawable.profile)
+                                                .into(avatar_result);
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+
                                 } else {
                                     avatar_result.setImageDrawable(ChatGroupActivity.this.getDrawable(R.drawable.profile));
                                 }
@@ -698,10 +878,13 @@ public class ChatGroupActivity extends AppCompatActivity {
                             room.setLastMessId(user.getPhoneNumber());
                             room.setRoomTimeLastMess(time);
                             reference.child("Users").child(user.getPhoneNumber()).child("rooms").child(roomID).setValue(room);
-                            listUser.add(finalSearch_phone);
-                            for (String user_phone : listUser) {
-                                reference.child("Rooms").child(roomID).child("listSeen").child(user_phone).child("is").setValue(false);
-                                reference.child("Users").child(user_phone).child("rooms").child(roomID).setValue(room).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            User newUser = new User();
+                            newUser.setPhoneNumber(finalSearch_phone);
+                            newUser.setToken(token[0]);
+                            listUser.add(newUser);
+                            for (User user_phone : listUser) {
+                                reference.child("Rooms").child(roomID).child("listSeen").child(user_phone.getPhoneNumber()).child("is").setValue(false);
+                                reference.child("Users").child(user_phone.getPhoneNumber()).child("rooms").child(roomID).setValue(room).addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if (dialog.isShowing()) {
@@ -1110,11 +1293,20 @@ public class ChatGroupActivity extends AppCompatActivity {
         reference.child("Rooms").child(chat_room.getRoomID()).child("listSeen").child(user.getPhoneNumber()).child("is").setValue(true);
 
 
-        for (String str : listUser) {
-            reference.child("Users").child(str).child("rooms").child(roomID).child("roomTimeLastMess").setValue(time_now);
-            reference.child("Users").child(str).child("rooms").child(roomID).child("lastMess").setValue(mess_content);
-            reference.child("Users").child(str).child("rooms").child(roomID).child("lastMessId").setValue(user.getPhoneNumber());
-            reference.child("Rooms").child(chat_room.getRoomID()).child("listSeen").child(str).child("is").setValue(false);
+        for (User user_receive : listUser) {
+            SendNotification.send(
+                    ChatGroupActivity.this, user_receive.getToken(),
+                    chat_room.getRoomName(),
+                    mess.getMessage(),
+                    roomID,
+                    mess.getType(),
+                    User.getInstance().getUserAvatar(),
+                    true
+            );
+            reference.child("Users").child(user_receive.getPhoneNumber()).child("rooms").child(roomID).child("roomTimeLastMess").setValue(time_now);
+            reference.child("Users").child(user_receive.getPhoneNumber()).child("rooms").child(roomID).child("lastMess").setValue(mess_content);
+            reference.child("Users").child(user_receive.getPhoneNumber()).child("rooms").child(roomID).child("lastMessId").setValue(user.getPhoneNumber());
+            reference.child("Rooms").child(chat_room.getRoomID()).child("listSeen").child(user_receive.getPhoneNumber()).child("is").setValue(false);
         }
     }
 }

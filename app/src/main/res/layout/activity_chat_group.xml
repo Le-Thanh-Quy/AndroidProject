@@ -261,29 +261,31 @@
         android:layout_width="wrap_content"
         android:layout_height="50dp"
         android:layout_below="@+id/layout_title"
+        android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
         android:background="@color/black"
-        android:layout_centerHorizontal="true"
         android:backgroundTint="@color/app_color"
-        android:visibility="gone"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:visibility="gone">
 
         <ImageView
             android:id="@+id/logo_notification"
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:layout_marginStart="25dp"
             android:layout_gravity="center"
+            android:layout_marginStart="25dp"
             android:src="@drawable/new_mess"
             app:tint="@color/white" />
+
         <Space
             android:layout_width="10dp"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="25dp"
             android:layout_gravity="center"
+            android:layout_marginEnd="25dp"
             android:fontFamily="sans-serif-black"
             android:text="Tin nhắn mới!"
             android:textAlignment="center"
@@ -298,8 +300,8 @@
         android:layout_below="@+id/layout_title"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
-        android:visibility="gone"
-        android:background="#A3CCED">
+        android:background="#A3CCED"
+        android:visibility="gone">
 
         <TextView
             android:layout_width="wrap_content"
@@ -321,8 +323,8 @@
             android:layout_height="20dp"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:src="@drawable/add_user"
             android:layout_marginEnd="20dp"
+            android:src="@drawable/add_user"
             app:tint="@color/app_color" />
     </RelativeLayout>
 </RelativeLayout>

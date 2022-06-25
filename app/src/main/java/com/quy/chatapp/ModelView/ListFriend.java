@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -87,15 +88,20 @@ public class ListFriend extends RecyclerView.Adapter<ListFriend.viewHolder> {
         });
         holder.friendName.setText(user.getUserName());
         if (!"null".equals(user.getUserAvatar())) {
-            Glide.with(context)
-                    .load(user.getUserAvatar()) // web image url
-                    .centerInside()
+            try {
+                Glide.with(context)
+                        .load(user.getUserAvatar()) // web image url
+                        .centerInside()
 //                    .rotate(90)                    //if you want to rotate by 90 degrees
-                    .error(R.drawable.profile)
-                    .placeholder(R.drawable.profile)
-                    .into(holder.friendAvatar);
+                        .error(R.drawable.profile)
+                        .placeholder(R.drawable.profile)
+                        .into(holder.friendAvatar);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
         } else {
-            holder.friendAvatar.setImageDrawable(context.getDrawable(R.drawable.profile));
+            holder.friendAvatar.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.profile));
         }
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {

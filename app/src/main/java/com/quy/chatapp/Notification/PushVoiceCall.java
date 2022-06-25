@@ -91,8 +91,8 @@ public class PushVoiceCall {
         @Override
         public void onCallEnded(Call endedCall) {
             MainActivity.id_user = tempUserName;
-            if(mediaPlayer != null) {
-                if(mediaPlayer.isPlaying()) {
+            if (mediaPlayer != null) {
+                if (mediaPlayer.isPlaying()) {
                     mediaPlayer.stop();
                 }
             }
@@ -110,8 +110,8 @@ public class PushVoiceCall {
         public void onCallEstablished(Call establishedCall) {
             tempUserName = MainActivity.id_user;
             MainActivity.id_user = theirUserPhone;
-            if(mediaPlayer != null) {
-                if(mediaPlayer.isPlaying()) {
+            if (mediaPlayer != null) {
+                if (mediaPlayer.isPlaying()) {
                     mediaPlayer.stop();
                 }
             }
@@ -169,15 +169,19 @@ public class PushVoiceCall {
                                 User theirUser = task.getResult().getValue(User.class);
                                 assert theirUser != null;
                                 name.setText(theirUser.getUserName());
-                                Glide.with(context).load(theirUser.getUserAvatar()).placeholder(R.drawable.profile).into(avatar);
+                                try {
+                                    Glide.with(context).load(theirUser.getUserAvatar()).placeholder(R.drawable.profile).into(avatar);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
                             }
                         });
                     } else {
                         if (call != null) {
                             call.hangup();
                         }
-                        if(mediaPlayer != null) {
-                            if(mediaPlayer.isPlaying()) {
+                        if (mediaPlayer != null) {
+                            if (mediaPlayer.isPlaying()) {
                                 mediaPlayer.stop();
                             }
                         }
@@ -200,7 +204,7 @@ public class PushVoiceCall {
                     if (call != null) {
                         call.hangup();
                     }
-                    if(mediaPlayer.isPlaying()) {
+                    if (mediaPlayer.isPlaying()) {
                         mediaPlayer.stop();
                     }
                 }
@@ -208,8 +212,8 @@ public class PushVoiceCall {
             call_start.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if(mediaPlayer != null) {
-                        if(mediaPlayer.isPlaying()) {
+                    if (mediaPlayer != null) {
+                        if (mediaPlayer.isPlaying()) {
                             mediaPlayer.stop();
                         }
                     }
@@ -239,7 +243,6 @@ public class PushVoiceCall {
             } catch (Exception e) {
                 return;
             }
-
 
 
         }

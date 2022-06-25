@@ -20,6 +20,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -83,12 +84,16 @@ public class ListRoom extends RecyclerView.Adapter<ListRoom.viewHolder> {
                         String name = task.getResult().child("roomName").getValue(String.class);
                         String image = task.getResult().child("imageRoom").getValue(String.class);
                         holder.roomName.setText(name);
-                        Glide.with(context)
-                                .load(image)
-                                .centerCrop()
-                                .placeholder(context.getResources().getDrawable(R.drawable.team))
-                                .error(context.getResources().getDrawable(R.drawable.team))
-                                .into(holder.roomImage);
+                        try {
+                            Glide.with(context)
+                                    .load(image)
+                                    .centerCrop()
+                                    .placeholder(ContextCompat.getDrawable(context, R.drawable.team))
+                                    .error(ContextCompat.getDrawable(context, R.drawable.team))
+                                    .into(holder.roomImage);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                 });
             } else {
@@ -179,20 +184,13 @@ public class ListRoom extends RecyclerView.Adapter<ListRoom.viewHolder> {
                     public void onComplete(@NonNull Task<DataSnapshot> task) {
                         if (task.getResult().getValue() != null) {
                             other_user[0] = task.getResult().getValue(User.class);
-                            Glide.with(context).load(other_user[0].getUserAvatar()).centerCrop().placeholder(context.getResources().getDrawable(R.drawable.profile)).listener(new RequestListener<Drawable>() {
-                                @Override
-                                public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                                    return false;
-                                }
+                            try {
+                                Glide.with(context).load(other_user[0].getUserAvatar()).centerCrop().placeholder(ContextCompat.getDrawable(context, R.drawable.profile)).into(holder.roomSeenImage);
+                                Glide.with(context).load(other_user[0].getUserAvatar()).centerCrop().placeholder(ContextCompat.getDrawable(context, R.drawable.profile)).into(holder.roomImage);
 
-                                @Override
-                                public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                                    BitmapDrawable drawable = (BitmapDrawable) holder.roomImage.getDrawable();
-                                    Bitmap bitmapAvatar = drawable.getBitmap();
-                                    holder.roomSeenImage.setImageBitmap(bitmapAvatar);
-                                    return false;
-                                }
-                            }).into(holder.roomImage);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                             eventStatus(holder, other_user[0]);
                         }
                     }
