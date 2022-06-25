@@ -7,8 +7,10 @@
 
     <!-- TODO: Update blank fragment layout -->
     <TextView
+        android:layout_gravity="center"
+        android:gravity="center"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:text="Tính năng sẽ sớm ra mắt" />
 
 </FrameLayout>

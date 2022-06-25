@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
+    android:orientation="vertical"
+    android:overScrollMode="never"
+    android:scrollbars="none">
+
+    <RelativeLayout
+        android:id="@+id/layout_title"
+        android:layout_width="match_parent"
+        android:layout_height="60dp">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/imageBack"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            android:padding="@dimen/_5sdp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_left"
+            android:tint="#192497"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="MissingConstraints" />
+
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/imageUser"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="@dimen/_12sdp"
+            android:layout_toEndOf="@+id/imageBack"
+            app:cardCornerRadius="100dp"
+            app:layout_constraintStart_toEndOf="@id/imageBack"
+            app:layout_constraintTop_toTopOf="parent"
+            app:riv_corner_radius="@dimen/_30sdp">
+
+            <ImageView
+                android:id="@+id/avatar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/profile" />
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/user_online"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:layout_below="@+id/imageUser"
+            android:layout_alignEnd="@+id/imageUser"
+            android:layout_marginTop="-10dp"
+            android:layout_marginEnd="3dp"
+            android:backgroundTint="#22AA1F"
+            app:cardCornerRadius="100dp" />
+
+        <ImageView
+            android:id="@+id/voice_call"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="0dp"
+            android:layout_toStartOf="@+id/call_video"
+            android:padding="10dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/phone_call"
+            app:tint="#192497" />
+
+        <ImageView
+            android:id="@+id/call_video"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="0dp"
+            android:layout_toStartOf="@+id/user_info"
+            android:padding="10dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/video_call"
+            app:tint="#192497" />
+
+        <ImageView
+            android:id="@+id/user_info"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="0dp"
+            android:padding="10dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/info_user"
+            app:tint="#192497" />
+
+        <TextView
+            android:id="@+id/textName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/imageUser"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="5dp"
+            android:layout_toStartOf="@+id/voice_call"
+            android:layout_toEndOf="@+id/imageUser"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-black"
+            android:gravity="left"
+            android:maxLines="1"
+            android:paddingStart="@dimen/_2sdp"
+            android:singleLine="true"
+            android:text=""
+            android:textColor="@color/primary_text"
+            android:textSize="@dimen/_14ssp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/textOnline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textName"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="5dp"
+            android:layout_toStartOf="@+id/voice_call"
+            android:layout_toEndOf="@+id/imageUser"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-black"
+            android:maxLines="1"
+            android:paddingStart="@dimen/_2sdp"
+            android:singleLine="true"
+            android:text=""
+            android:textColor="@color/secondary_text"
+            android:textSize="@dimen/_9ssp" />
+    </RelativeLayout>
+
+    <View
+        android:id="@+id/viewSupporter"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/layout_title"
+        android:layout_marginTop="0dp"
+        android:background="#DADADA" />
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/list_chat"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/layout_input"
+        android:layout_below="@+id/viewSupporter"
+        android:layout_marginTop="0dp"
+        android:layout_marginBottom="0dp"
+        android:clipToPadding="false"
+        android:listSelector="@android:color/transparent"
+        android:padding="5dp" />
+
+
+    <RelativeLayout
+        android:id="@+id/layout_input"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="0dp"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/chooseImageSend"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="0dp"
+            android:padding="12dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/add_photo" />
+
+        <EditText
+            android:id="@+id/inputMessage"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="8dp"
+            android:layout_toStartOf="@+id/layout_send"
+            android:layout_toEndOf="@+id/chooseImageSend"
+            android:background="@drawable/input_mess"
+            android:focusable="true"
+            android:fontFamily="sans-serif-black"
+            android:hint="Aaa..."
+            android:inputType="text"
+            android:paddingHorizontal="10dp"
+            android:textColor="#000000"
+            android:textCursorDrawable="@drawable/color_cursor" />
+
+        <LinearLayout
+            android:id="@+id/layout_send"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="0dp"
+            android:focusable="false"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/send_icon"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:padding="12dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/like_mess_0" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/send_mess"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:padding="12dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/send_mess"
+                android:tint="@color/primary"
+                android:visibility="gone"
+                app:tint="#192497" />
+        </LinearLayout>
+
+    </RelativeLayout>
+
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="@dimen/_25sdp"
+        android:layout_height="@dimen/_25sdp"
+        android:layout_centerInParent="true"
+        android:indeterminate="true"
+        android:indeterminateTint="@color/black"
+        android:indeterminateTintMode="src_atop"
+        tools:ignore="MissingConstraints" />
+
+    <ImageView
+        android:id="@+id/not_found"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_centerInParent="true"
+        android:src="@drawable/conversation_person"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/new_mess"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_below="@+id/layout_title"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:background="@color/black"
+        android:backgroundTint="@color/app_color"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/logo_notification"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="center"
+            android:layout_marginStart="25dp"
+            android:src="@drawable/new_mess"
+            app:tint="@color/white" />
+
+        <Space
+            android:layout_width="10dp"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginEnd="25dp"
+            android:fontFamily="sans-serif-black"
+            android:text="Tin nhắn mới!"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="15sp" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/layout_add_friend"
+        android:layout_width="230dp"
+        android:layout_height="55dp"
+        android:layout_below="@+id/layout_title"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:background="#A3CCED"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="5dp"
+            android:layout_toStartOf="@+id/add_friend"
+            android:fontFamily="sans-serif-black"
+            android:text="Thêm người này"
+            android:textAlignment="center"
+            android:textColor="@color/app_color"
+            android:textSize="20sp" />
+
+        <ImageView
+            android:id="@+id/add_friend"
+            android:layout_width="25dp"
+            android:layout_height="20dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="20dp"
+            android:src="@drawable/add_user"
+            app:tint="@color/app_color" />
+    </RelativeLayout>
+</RelativeLayout>

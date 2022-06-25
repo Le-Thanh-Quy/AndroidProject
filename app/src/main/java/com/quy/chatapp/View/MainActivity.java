@@ -20,8 +20,10 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.Editable;
@@ -30,6 +32,7 @@ import android.text.method.PasswordTransformationMethod;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -37,6 +40,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -84,12 +92,23 @@ public class MainActivity extends AppCompatActivity {
     SharedPreferences sharedPreferences;
     String phone;
     int countBack = 0;
-
+    private String [] permissions = {"android.permission.WRITE_EXTERNAL_STORAGE", "android.permission.ACCESS_FINE_LOCATION", "android.permission.READ_PHONE_STATE", "android.permission.SYSTEM_ALERT_WINDOW","android.permission.CAMERA"};
+    private void offKeyboard() {
+        if(getCurrentFocus() != null) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        offKeyboard();
+        int requestCode = 200;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestPermissions(permissions, requestCode);
+        }
         if (ContextCompat.checkSelfPermission(MainActivity.this,
                 android.Manifest.permission.RECORD_AUDIO) !=
                 PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission
@@ -127,10 +146,21 @@ public class MainActivity extends AppCompatActivity {
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             if (bundle.getBoolean("isNotification")) {
-                User theirUser = (User) bundle.getSerializable("other_user");
-                Intent intent = new Intent(MainActivity.this, ChatActivity.class);
-                intent.putExtra("other_user", theirUser);
-                startActivity(intent);
+                if(bundle.getBoolean("isGroup")) {
+                    String roomId = bundle.getString("room_id");
+                    System.out.println(roomId + "AAAAAAAAAAAAAAAA");
+                    Intent intent = new Intent(MainActivity.this, ChatGroupActivity.class);
+                    intent.putExtra("id_room", roomId);
+                    startActivity(intent);
+                    return;
+                } else {
+                    User theirUser = (User) bundle.getSerializable("other_user");
+                    System.out.println(theirUser.getPhoneNumber() + "AAAAAAAAAAAAAAAABBBBBB");
+                    Intent intent = new Intent(MainActivity.this, ChatActivity.class);
+                    intent.putExtra("other_user", theirUser);
+                    startActivity(intent);
+                    return;
+                }
             }
         }
         PushVoiceCall.user = User.getInstance();
@@ -173,13 +203,18 @@ public class MainActivity extends AppCompatActivity {
                     String avatar = User.getInstance().getUserAvatar();
                     assert avatar != null;
                     if (!avatar.equals("null")) {
-                        Picasso.get()
-                                .load(avatar) // web image url
-                                .fit().centerInside()
+                        try {
+                            Glide.with(MainActivity.this)
+                                    .load(avatar) // web image url
+                                    .centerInside()
 //                                .rotate(90)
-                                .error(R.drawable.profile)
-                                .placeholder(R.drawable.profile)
-                                .into(binding.avatar);
+                                    .error(R.drawable.profile)
+                                    .placeholder(R.drawable.profile)
+                                    .into(binding.avatar);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
                     }
 
                 }
@@ -304,7 +339,11 @@ public class MainActivity extends AppCompatActivity {
 
                     addEventDialog(user);
                     addEventEdit(user);
-                    dialog.show();
+                    try {
+                        dialog.show();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });

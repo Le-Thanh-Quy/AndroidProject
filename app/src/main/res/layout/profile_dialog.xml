@@ -54,7 +54,7 @@
             android:layout_alignEnd="@+id/layout_avatar"
             android:layout_marginTop="-45dp"
             android:layout_marginEnd="0dp"
-            android:backgroundTint="#CBF6D7"
+            android:backgroundTint="#CBE2F6"
             app:cardCornerRadius="100dp">
 
             <ImageView

@@ -2,6 +2,7 @@ package com.quy.chatapp.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -66,10 +67,10 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (isShowPass) {
                     binding.etPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
-                    binding.hideShowPass.setImageDrawable(getResources().getDrawable(R.drawable.show_pass));
+                    binding.hideShowPass.setImageDrawable(ContextCompat.getDrawable(LoginActivity.this , R.drawable.show_pass));
                 } else {
                     binding.etPassword.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
-                    binding.hideShowPass.setImageDrawable(getResources().getDrawable(R.drawable.hidden_pass));
+                    binding.hideShowPass.setImageDrawable(ContextCompat.getDrawable(LoginActivity.this, R.drawable.hidden_pass));
                 }
                 binding.etPassword.setSelection(binding.etPassword.getText().length());
                 isShowPass = !isShowPass;

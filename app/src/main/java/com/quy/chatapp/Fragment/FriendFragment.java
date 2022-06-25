@@ -9,6 +9,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -25,6 +26,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
@@ -173,15 +175,20 @@ public class FriendFragment extends Fragment {
                                 User user = task.getResult().getValue(User.class);
                                 name_result.setText(user.getUserName());
                                 if (!"null".equals(user.getUserAvatar())) {
-                                    Picasso.get()
-                                            .load(user.getUserAvatar())
-                                            .fit().centerInside()
+                                    try {
+                                        Glide.with(context)
+                                                .load(user.getUserAvatar())
+                                                .centerInside()
 //                                            .rotate(90)
-                                            .error(R.drawable.profile)
-                                            .placeholder(R.drawable.profile)
-                                            .into(avatar_result);
+                                                .error(R.drawable.profile)
+                                                .placeholder(R.drawable.profile)
+                                                .into(avatar_result);
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+
                                 } else {
-                                    avatar_result.setImageDrawable(context.getDrawable(R.drawable.profile));
+                                    avatar_result.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.profile));
                                 }
                                 result_search.setVisibility(View.VISIBLE);
                             } else {

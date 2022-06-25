@@ -2,6 +2,7 @@ package com.quy.chatapp.ModelView;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -11,6 +12,7 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,9 +28,14 @@ import android.widget.Toast;
 import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -44,9 +51,13 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
 
@@ -56,6 +67,7 @@ public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
     public User theirUser;
     public String roomID;
     public boolean isGroup;
+    public List<User> userList;
     DatabaseReference reference;
     Bitmap bitmapAvatar;
     int stopPosition = 0;
@@ -68,6 +80,7 @@ public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
         this.roomID = roomID;
         this.theirUser = theirUser;
         this.bitmapAvatar = bitmapAvatar;
+        userList = new ArrayList<>();
         reference = FirebaseDatabase.getInstance().getReference();
     }
 
@@ -78,6 +91,8 @@ public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
         return new viewHolder(view);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    @SuppressLint("RecyclerView")
     @Override
     public void onBindViewHolder(@NonNull viewHolder holder, int position) {
         Mess mess = listData.get(position);
@@ -92,11 +107,60 @@ public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
         holder.their_mess_content.setVisibility(View.GONE);
         holder.my_mess_video.setVisibility(View.GONE);
         holder.their_mess_video.setVisibility(View.GONE);
-        holder.their_avatar.setImageBitmap(bitmapAvatar);
 
+
+        holder.their_avatar.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+        if (isGroup) {
+            holder.layout_seen.setVisibility(View.INVISIBLE);
+            holder.layout_seen_their.setVisibility(View.INVISIBLE);
+            List<User> collect = userList.stream().filter(article -> article.getPhoneNumber().contains(mess.getUserId())).collect(Collectors.toList());
+            if(collect.size() == 0) {
+                reference.child("Users").child(mess.getUserId()).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DataSnapshot> task) {
+                        theirUser = task.getResult().getValue(User.class);
+                        userList.add(theirUser);
+                        createMess(mess, holder, position);
+                    }
+                });
+            } else {
+                theirUser = collect.get(0);
+                createMess(mess, holder, position);
+            }
+
+        } else {
+            createMess(mess, holder, position);
+        }
+
+
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void createMess(Mess mess, viewHolder holder, int position) {
         String time = mess.getTime();
+        holder.their_name.setText(theirUser.getUserName());
 
+        try {
+            Glide.with(context).load(theirUser.getUserAvatar()).into(holder.their_avatar);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
+        if ((position + 1) < listData.size()) {
+            if (listData.get(position + 1).getUserId().equals(listData.get(position).getUserId()) && !listData.get(position + 1).getType().equals("notification")) {
+                holder.layout_avatar.setVisibility(View.INVISIBLE);
+            } else {
+                holder.layout_avatar.setVisibility(View.VISIBLE);
+            }
+        }
+
+        if ((position - 1) >= 0) {
+            if (listData.get(position - 1).getUserId().equals(listData.get(position).getUserId()) && !listData.get(position - 1).getType().equals("notification")) {
+                holder.their_name.setVisibility(View.GONE);
+            } else {
+                holder.their_name.setVisibility(View.VISIBLE);
+            }
+        }
         holder.my_mess.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -139,59 +203,107 @@ public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
 
         if (!isGroup) {
             holder.their_name.setVisibility(View.GONE);
-        }
+            reference.child("Rooms").child(roomID).child("listSeen").child(theirUser.getPhoneNumber()).child("in").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.getValue() != null) {
+                        String messId = snapshot.getValue(String.class);
+                        holder.layout_seen.setVisibility(View.INVISIBLE);
+                        holder.layout_seen_their.setVisibility(View.INVISIBLE);
+                        holder.their_seen_me.setVisibility(View.INVISIBLE);
+                        holder.their_seen_their.setVisibility(View.INVISIBLE);
+                        if (mess.getTime().equals(messId)) {
+                            if (myPhone.equals(mess.getUserId())) {
+                                holder.layout_seen.setVisibility(View.VISIBLE);
+                                holder.their_seen_me.setVisibility(View.VISIBLE);
+                                try {
+                                    Glide.with(context).load(theirUser.getUserAvatar()).centerCrop().into(holder.their_seen_me);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
 
-        reference.child("Rooms").child(roomID).child("listSeen").child(theirUser.getPhoneNumber()).child("in").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.getValue() != null) {
-                    String messId = snapshot.getValue(String.class);
-                    holder.layout_seen.setVisibility(View.INVISIBLE);
-                    holder.layout_seen_their.setVisibility(View.INVISIBLE);
-                    holder.their_seen_me.setVisibility(View.INVISIBLE);
-                    holder.their_seen_their.setVisibility(View.INVISIBLE);
-                    if (mess.getTime().equals(messId)) {
-                        if (myPhone.equals(mess.getUserId())) {
-                            holder.layout_seen.setVisibility(View.VISIBLE);
-                            holder.their_seen_me.setVisibility(View.VISIBLE);
-                            holder.their_seen_me.setImageBitmap(bitmapAvatar);
-
-                        } else {
-                            holder.layout_seen_their.setVisibility(View.VISIBLE);
-                            holder.their_seen_their.setVisibility(View.VISIBLE);
-                            holder.their_seen_their.setImageBitmap(bitmapAvatar);
+                            } else {
+                                holder.layout_seen_their.setVisibility(View.VISIBLE);
+                                holder.their_seen_their.setVisibility(View.VISIBLE);
+                                try {
+                                    Glide.with(context).load(theirUser.getUserAvatar()).centerCrop().into(holder.their_seen_their);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
                         }
                     }
                 }
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
 
-            }
-        });
-
-
+                }
+            });
+            // notification
+        }
         // notification
         if (mess.getType().equals("notification")) {
             holder.mess_notification.setVisibility(View.VISIBLE);
             String[] contentNotification = mess.getMessage().split("__@__");
             if (contentNotification[0].equals("1")) {
                 if (mess.getUserId().equals(myPhone)) {
-                    holder.mess_notification.setText("Bạn đã đặt biệt hiệu cho " + theirUser.getUserName() + " là " + contentNotification[1]);
+                    if (isGroup) {
+                        holder.mess_notification.setText("Bạn đã đặt tên cho nhóm là " + contentNotification[1]);
+                    } else {
+                        holder.mess_notification.setText("Bạn đã đặt biệt hiệu cho " + theirUser.getUserName() + " là " + contentNotification[1]);
+                    }
                 } else {
-                    holder.mess_notification.setText(theirUser.getUserName() + " đã đặt biệt hiệu cho bạn là " + contentNotification[1]);
+                    if (isGroup) {
+                        holder.mess_notification.setText(theirUser.getUserName() + " đã đặt tên nhóm là " + contentNotification[1]);
+                    } else {
+                        holder.mess_notification.setText(theirUser.getUserName() + " đã đặt biệt hiệu cho bạn là " + contentNotification[1]);
+                    }
                 }
-            } else {
+            } else if (contentNotification[0].equals("2")) {
                 if (mess.getUserId().equals(myPhone)) {
                     holder.mess_notification.setText("Bạn đã thay đổi biểu tượng cảm xúc cuộc trò chuyện");
                 } else {
                     holder.mess_notification.setText(theirUser.getUserName() + " đã thay đổi biểu tượng cảm xúc cuộc trò chuyện");
                 }
+            } else if (contentNotification[0].equals("4")) {
+                if (mess.getUserId().equals(myPhone)) {
+                    holder.mess_notification.setText("Bạn đã thêm " + contentNotification[1] + " vào nhóm");
+                } else {
+                    holder.mess_notification.setText(theirUser.getUserName() + " đã thêm " + contentNotification[1] + " vào nhóm");
+                }
+            } else if (contentNotification[0].equals("5")) {
+                if (mess.getUserId().equals(myPhone)) {
+                    holder.mess_notification.setText("Bạn đã thay đổi ảnh nhóm");
+                } else {
+                    holder.mess_notification.setText(theirUser.getUserName() + " đã thay đổi ảnh nhóm");
+                }
+            } else if (contentNotification[0].equals("3")) {
+                if (mess.getUserId().equals(myPhone)) {
+                    holder.mess_notification.setText("Bạn đã tạo nhóm");
+                } else {
+                    holder.mess_notification.setText(theirUser.getUserName() + " đã tạo nhóm này");
+                }
+            } else if (contentNotification[0].equals("6")) {
+                if (mess.getUserId().equals(myPhone)) {
+                    holder.mess_notification.setText("Bạn đã tham gia đoạn chat video");
+                } else {
+                    holder.mess_notification.setText(theirUser.getUserName() + " đã tham gia đoạn chat video");
+                }
+            } else if (contentNotification[0].equals("7")) {
+                if (mess.getUserId().equals(myPhone)) {
+                    holder.mess_notification.setText("Bạn đã rời khỏi đoạn chat video");
+                } else {
+                    holder.mess_notification.setText(theirUser.getUserName() + " đã rời khỏi đoạn chat video");
+                }
+            } else if (contentNotification[0].equals("8")) {
+                holder.mess_notification.setText("Đoạn chat video đã kết thúc");
             }
 
             return;
         }
+
+
         // icon
         if (mess.getType().equals("icon")) {
             int idIcon = context.getResources().getIdentifier("like_mess_" + mess.getMessage(), "drawable", context.getPackageName());
@@ -203,13 +315,6 @@ public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
                 }
                 holder.mess_icon.setImageResource(idIcon);
             } else {
-                if ((position + 1) < listData.size()) {
-                    if (!listData.get(position + 1).getUserId().equals(myPhone)) {
-                        holder.layout_avatar.setVisibility(View.INVISIBLE);
-                    } else {
-                        holder.layout_avatar.setVisibility(View.VISIBLE);
-                    }
-                }
                 holder.their_mess.setVisibility(View.VISIBLE);
                 holder.their_mess_icon.setVisibility(View.VISIBLE);
                 if (mess.getMessage().equals("0")) {
@@ -236,18 +341,20 @@ public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
             if (mess.getUserId().equals(myPhone)) {
                 holder.my_mess.setVisibility(View.VISIBLE);
                 holder.my_mess_image.setVisibility(View.VISIBLE);
-                Picasso.get().load(mess.getMessage()).fit().centerCrop().into(holder.my_mess_image);
-            } else {
-                if ((position + 1) < listData.size()) {
-                    if (!listData.get(position + 1).getUserId().equals(myPhone)) {
-                        holder.layout_avatar.setVisibility(View.INVISIBLE);
-                    } else {
-                        holder.layout_avatar.setVisibility(View.VISIBLE);
-                    }
+                try {
+                    Glide.with(context).load(mess.getMessage()).centerCrop().into(holder.my_mess_image);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
+
+            } else {
                 holder.their_mess.setVisibility(View.VISIBLE);
                 holder.their_mess_image.setVisibility(View.VISIBLE);
-                Picasso.get().load(mess.getMessage()).fit().centerCrop().into(holder.their_mess_image);
+                try {
+                    Glide.with(context).load(mess.getMessage()).centerCrop().into(holder.their_mess_image);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             holder.my_mess_image.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -282,13 +389,6 @@ public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
                 holder.my_mess_video.setVisibility(View.VISIBLE);
 
             } else {
-                if ((position + 1) < listData.size()) {
-                    if (!listData.get(position + 1).getUserId().equals(myPhone)) {
-                        holder.layout_avatar.setVisibility(View.INVISIBLE);
-                    } else {
-                        holder.layout_avatar.setVisibility(View.VISIBLE);
-                    }
-                }
                 holder.their_mess.setVisibility(View.VISIBLE);
                 holder.their_mess_video.setVisibility(View.VISIBLE);
             }
@@ -325,13 +425,6 @@ public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
                 holder.my_mess_content.setTextColor(Color.parseColor("#FFCDCDCD"));
                 holder.my_mess_content.setBackgroundResource(R.drawable.border_mess_remove);
             } else {
-                if ((position + 1) < listData.size()) {
-                    if (!listData.get(position + 1).getUserId().equals(myPhone)) {
-                        holder.layout_avatar.setVisibility(View.INVISIBLE);
-                    } else {
-                        holder.layout_avatar.setVisibility(View.VISIBLE);
-                    }
-                }
                 holder.their_mess.setVisibility(View.VISIBLE);
                 holder.their_mess_content.setVisibility(View.VISIBLE);
                 holder.their_mess_content.setText("Tin nhắn đã bị thu hồi");
@@ -347,7 +440,7 @@ public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
             if (mess.getMessage().contains(":")) {
                 isCall = true;
             }
-            Drawable img = context.getResources().getDrawable(R.drawable.ic_call);
+            Drawable img = ContextCompat.getDrawable(context, R.drawable.ic_call);
             if (isCall) {
                 img.setTint(Color.BLUE);
             } else {
@@ -361,16 +454,33 @@ public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
                 holder.my_mess_content.setBackgroundResource(R.drawable.border_their_mess);
                 holder.my_mess_content.setCompoundDrawablesWithIntrinsicBounds(img, null, null, null);
             } else {
-                if ((position + 1) < listData.size()) {
-                    if (!listData.get(position + 1).getUserId().equals(myPhone)) {
-                        holder.layout_avatar.setVisibility(View.INVISIBLE);
-                    } else {
-                        holder.layout_avatar.setVisibility(View.VISIBLE);
-                    }
-                }
                 holder.their_mess.setVisibility(View.VISIBLE);
                 holder.their_mess_content.setVisibility(View.VISIBLE);
                 holder.their_mess_content.setText(mess.getMessage());
+                holder.their_mess_content.setTextColor(Color.BLACK);
+                holder.their_mess_content.setBackgroundResource(R.drawable.border_their_mess);
+                holder.their_mess_content.setCompoundDrawablesWithIntrinsicBounds(img, null, null, null);
+            }
+            return;
+        }
+
+        // call
+        if (mess.getType().equals("video_call")) {
+            Drawable img = ContextCompat.getDrawable(context, R.drawable.ic_call_video);
+            assert img != null;
+            img.setTint(Color.BLACK);
+
+            if (mess.getUserId().equals(myPhone)) {
+                holder.my_mess.setVisibility(View.VISIBLE);
+                holder.my_mess_content.setVisibility(View.VISIBLE);
+                holder.my_mess_content.setText("Bạn đã " + mess.getMessage().toLowerCase());
+                holder.my_mess_content.setTextColor(Color.BLACK);
+                holder.my_mess_content.setBackgroundResource(R.drawable.border_their_mess);
+                holder.my_mess_content.setCompoundDrawablesWithIntrinsicBounds(img, null, null, null);
+            } else {
+                holder.their_mess.setVisibility(View.VISIBLE);
+                holder.their_mess_content.setVisibility(View.VISIBLE);
+                holder.their_mess_content.setText(theirUser.getUserName() + " đã " + mess.getMessage().toLowerCase());
                 holder.their_mess_content.setTextColor(Color.BLACK);
                 holder.their_mess_content.setBackgroundResource(R.drawable.border_their_mess);
                 holder.their_mess_content.setCompoundDrawablesWithIntrinsicBounds(img, null, null, null);
@@ -443,13 +553,6 @@ public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
             holder.their_mess_content.setVisibility(View.VISIBLE);
             holder.their_mess_content.setText(mess.getMessage());
 
-            if ((position + 1) < listData.size()) {
-                if (!listData.get(position + 1).getUserId().equals(myPhone)) {
-                    holder.layout_avatar.setVisibility(View.INVISIBLE);
-                } else {
-                    holder.layout_avatar.setVisibility(View.VISIBLE);
-                }
-            }
 
             // UI
 
@@ -498,8 +601,6 @@ public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
             }
 
             // END
-
-
         }
     }
 
@@ -594,7 +695,7 @@ public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
                 switch (which) {
                     case DialogInterface.BUTTON_POSITIVE:
                         reference.child("Rooms").child(roomID).child("listMess").child(mess.getTime()).child("type").setValue("delete");
-                        SendNotification.send(context, theirUser.getToken(), User.getInstance().getUserName(), "Đã thu hồi một tin nhắn", myPhone, "delete", User.getInstance().getUserAvatar());
+                        SendNotification.send(context, theirUser.getToken(), User.getInstance().getUserName(), "Đã thu hồi một tin nhắn", myPhone, "delete", User.getInstance().getUserAvatar(), false);
                         break;
 
                     case DialogInterface.BUTTON_NEGATIVE:
