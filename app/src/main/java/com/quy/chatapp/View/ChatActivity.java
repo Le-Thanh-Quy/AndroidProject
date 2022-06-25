@@ -218,6 +218,7 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     boolean isJoinVideoCall = false;
+
     @Override
     protected void onResume() {
         if (isJoinVideoCall) {
@@ -436,6 +437,62 @@ public class ChatActivity extends AppCompatActivity {
                         }
                     });
 
+                }
+            }
+        });
+        binding.callVideo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (isFirstMess) {
+                    MyToast.show(ChatActivity.this, "Bạn chưa thể thực hiện cuộc gọi video", 0);
+                } else {
+                    reference.child("Rooms").child(chat_room.getRoomID()).child("isVideoCall").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DataSnapshot> task) {
+                            if (Boolean.TRUE.equals(task.getResult().getValue(Boolean.class))) {
+                                String time_now = String.valueOf(System.currentTimeMillis());
+                                Mess mess = new Mess();
+                                mess.setType("notification");
+                                mess.setUserId(user.getPhoneNumber());
+                                mess.setTime(time_now);
+                                mess.setMessage("6__@__");
+                                reference.child("Rooms").child(chat_room.getRoomID()).child("listMess").child(time_now).setValue(mess);
+                            } else {
+                                reference.child("Rooms").child(chat_room.getRoomID()).child("isVideoCall").setValue(true);
+                                reference.child("Rooms").child(chat_room.getRoomID()).child("videoCallMember").setValue(0);
+                                sendMess("Bắt đầu chat video", "video_call");
+                            }
+                            reference.child("Rooms").child(chat_room.getRoomID()).child("videoCallMember").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DataSnapshot> task) {
+                                    int videoCallMember = 0;
+                                    if (task.getResult().exists()) {
+                                        videoCallMember = Integer.parseInt(task.getResult().getValue().toString());
+                                    }
+                                    reference.child("Rooms").child(chat_room.getRoomID()).child("videoCallMember").setValue(videoCallMember + 1);
+                                    isJoinVideoCall = true;
+                                    try {
+                                        JitsiMeetUserInfo userInfo = new JitsiMeetUserInfo();
+                                        userInfo.setDisplayName(user.getUserName());
+                                        userInfo.setAvatar(new URL(user.getUserAvatar()));
+                                        JitsiMeetConferenceOptions options = new JitsiMeetConferenceOptions.Builder()
+                                                .setServerURL(new URL("https://meet.jit.si"))
+                                                .setRoom(chat_room.getRoomID() + "chatapp")
+                                                .setAudioOnly(false)
+                                                .setUserInfo(userInfo)
+                                                .setWelcomePageEnabled(false)
+                                                .setFeatureFlag("chat.ena bled", false)
+                                                .setFeatureFlag("invite.enabled", false)
+                                                .build();
+                                        JitsiMeetActivity.launch(ChatActivity.this, options);
+                                    } catch (
+                                            Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            });
+                        }
+                    });
                 }
             }
         });

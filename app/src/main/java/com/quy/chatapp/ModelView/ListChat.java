@@ -12,6 +12,7 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,7 @@ import android.widget.Toast;
 import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
@@ -49,9 +51,13 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
 
@@ -61,6 +67,7 @@ public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
     public User theirUser;
     public String roomID;
     public boolean isGroup;
+    public List<User> userList;
     DatabaseReference reference;
     Bitmap bitmapAvatar;
     int stopPosition = 0;
@@ -73,6 +80,7 @@ public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
         this.roomID = roomID;
         this.theirUser = theirUser;
         this.bitmapAvatar = bitmapAvatar;
+        userList = new ArrayList<>();
         reference = FirebaseDatabase.getInstance().getReference();
     }
 
@@ -83,6 +91,7 @@ public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
         return new viewHolder(view);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @SuppressLint("RecyclerView")
     @Override
     public void onBindViewHolder(@NonNull viewHolder holder, int position) {
@@ -100,29 +109,27 @@ public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
         holder.their_mess_video.setVisibility(View.GONE);
 
 
+        holder.their_avatar.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         if (isGroup) {
             holder.layout_seen.setVisibility(View.INVISIBLE);
             holder.layout_seen_their.setVisibility(View.INVISIBLE);
-            reference.child("Users").child(mess.getUserId()).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DataSnapshot> task) {
-                    theirUser = task.getResult().getValue(User.class);
-                    try {
-                        Glide.with(context).load(theirUser.getUserAvatar()).into(holder.their_avatar);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+            List<User> collect = userList.stream().filter(article -> article.getPhoneNumber().contains(mess.getUserId())).collect(Collectors.toList());
+            if(collect.size() == 0) {
+                reference.child("Users").child(mess.getUserId()).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DataSnapshot> task) {
+                        theirUser = task.getResult().getValue(User.class);
+                        userList.add(theirUser);
+                        createMess(mess, holder, position);
                     }
+                });
+            } else {
+                theirUser = collect.get(0);
+                createMess(mess, holder, position);
+            }
 
-                    createMess(mess, holder, position);
-                }
-            });
         } else {
             createMess(mess, holder, position);
-            try {
-                Glide.with(context).load(theirUser.getUserAvatar()).into(holder.their_avatar);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }
 
 
@@ -133,9 +140,14 @@ public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
         String time = mess.getTime();
         holder.their_name.setText(theirUser.getUserName());
 
+        try {
+            Glide.with(context).load(theirUser.getUserAvatar()).into(holder.their_avatar);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         if ((position + 1) < listData.size()) {
-            if (listData.get(position + 1).getUserId().equals(listData.get(position).getUserId())) {
+            if (listData.get(position + 1).getUserId().equals(listData.get(position).getUserId()) && !listData.get(position + 1).getType().equals("notification")) {
                 holder.layout_avatar.setVisibility(View.INVISIBLE);
             } else {
                 holder.layout_avatar.setVisibility(View.VISIBLE);
@@ -143,7 +155,7 @@ public class ListChat extends RecyclerView.Adapter<ListChat.viewHolder> {
         }
 
         if ((position - 1) >= 0) {
-            if (listData.get(position - 1).getUserId().equals(listData.get(position).getUserId())) {
+            if (listData.get(position - 1).getUserId().equals(listData.get(position).getUserId()) && !listData.get(position - 1).getType().equals("notification")) {
                 holder.their_name.setVisibility(View.GONE);
             } else {
                 holder.their_name.setVisibility(View.VISIBLE);
