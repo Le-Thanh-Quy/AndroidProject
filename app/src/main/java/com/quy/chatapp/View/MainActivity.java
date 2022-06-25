@@ -20,6 +20,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -39,6 +40,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -135,10 +140,21 @@ public class MainActivity extends AppCompatActivity {
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             if (bundle.getBoolean("isNotification")) {
-                User theirUser = (User) bundle.getSerializable("other_user");
-                Intent intent = new Intent(MainActivity.this, ChatActivity.class);
-                intent.putExtra("other_user", theirUser);
-                startActivity(intent);
+                if(bundle.getBoolean("isGroup")) {
+                    String roomId = bundle.getString("room_id");
+                    System.out.println(roomId + "AAAAAAAAAAAAAAAA");
+                    Intent intent = new Intent(MainActivity.this, ChatGroupActivity.class);
+                    intent.putExtra("id_room", roomId);
+                    startActivity(intent);
+                    return;
+                } else {
+                    User theirUser = (User) bundle.getSerializable("other_user");
+                    System.out.println(theirUser.getPhoneNumber() + "AAAAAAAAAAAAAAAABBBBBB");
+                    Intent intent = new Intent(MainActivity.this, ChatActivity.class);
+                    intent.putExtra("other_user", theirUser);
+                    startActivity(intent);
+                    return;
+                }
             }
         }
         PushVoiceCall.user = User.getInstance();
@@ -181,13 +197,18 @@ public class MainActivity extends AppCompatActivity {
                     String avatar = User.getInstance().getUserAvatar();
                     assert avatar != null;
                     if (!avatar.equals("null")) {
-                        Glide.with(MainActivity.this)
-                                .load(avatar) // web image url
-                                .centerInside()
+                        try {
+                            Glide.with(MainActivity.this)
+                                    .load(avatar) // web image url
+                                    .centerInside()
 //                                .rotate(90)
-                                .error(R.drawable.profile)
-                                .placeholder(R.drawable.profile)
-                                .into(binding.avatar);
+                                    .error(R.drawable.profile)
+                                    .placeholder(R.drawable.profile)
+                                    .into(binding.avatar);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
                     }
 
                 }
@@ -312,7 +333,11 @@ public class MainActivity extends AppCompatActivity {
 
                     addEventDialog(user);
                     addEventEdit(user);
-                    dialog.show();
+                    try {
+                        dialog.show();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });

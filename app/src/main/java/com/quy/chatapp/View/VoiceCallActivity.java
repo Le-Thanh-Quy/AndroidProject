@@ -3,10 +3,12 @@ package com.quy.chatapp.View;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.os.Build;
@@ -109,34 +111,37 @@ public class VoiceCallActivity extends AppCompatActivity {
         sinchClient.start();
 
         binding.name.setText(theirUser.getUserName());
+        try {
+            Glide.with(VoiceCallActivity.this).load(theirUser.getUserAvatar()).listener(new RequestListener<Drawable>() {
+                @Override
+                public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                    return false;
+                }
 
-        Glide.with(VoiceCallActivity.this).load(theirUser.getUserAvatar()).listener(new RequestListener<Drawable>() {
-            @Override
-            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                return false;
-            }
-
-            @Override
-            public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                Call();
-                binding.hangup.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        countDownTimer.cancel();
-                        if (isCall) {
-                            setResult(Activity.RESULT_OK, getIntent().putExtra("status", "Cuộc gọi thoại\n" + binding.time.getText()));
-                        } else {
-                            setResult(Activity.RESULT_OK, getIntent().putExtra("status", "Cuộc gọi nhỡ"));
+                @Override
+                public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                    Call();
+                    binding.hangup.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            countDownTimer.cancel();
+                            if (isCall) {
+                                setResult(Activity.RESULT_OK, getIntent().putExtra("status", "Cuộc gọi thoại\n" + binding.time.getText()));
+                            } else {
+                                setResult(Activity.RESULT_OK, getIntent().putExtra("status", "Cuộc gọi nhỡ"));
+                            }
+                            reference.child("Users").child(theirUser.getPhoneNumber()).child("isCall").setValue(null);
+                            reference.child("Users").child(user.getPhoneNumber()).child("isCall").setValue(null);
+                            call.hangup();
+                            finishAndRemoveTask();
                         }
-                        reference.child("Users").child(theirUser.getPhoneNumber()).child("isCall").setValue(null);
-                        reference.child("Users").child(user.getPhoneNumber()).child("isCall").setValue(null);
-                        call.hangup();
-                        finishAndRemoveTask();
-                    }
-                });
-                return false;
-            }
-        }).into(binding.avatar);
+                    });
+                    return false;
+                }
+            }).into(binding.avatar);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         binding.status.setText("Đang gọi...");
     }
 

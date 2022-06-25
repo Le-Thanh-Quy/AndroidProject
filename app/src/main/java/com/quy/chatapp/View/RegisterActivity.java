@@ -2,6 +2,7 @@ package com.quy.chatapp.View;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -69,10 +70,10 @@ public class RegisterActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (isShowPass) {
                     binding.etPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
-                    binding.hideShowPass.setImageDrawable(getResources().getDrawable(R.drawable.show_pass));
+                    binding.hideShowPass.setImageDrawable(ContextCompat.getDrawable(RegisterActivity.this, R.drawable.show_pass));
                 } else {
                     binding.etPassword.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
-                    binding.hideShowPass.setImageDrawable(getResources().getDrawable(R.drawable.hidden_pass));
+                    binding.hideShowPass.setImageDrawable(ContextCompat.getDrawable(RegisterActivity.this, R.drawable.hidden_pass));
                 }
                 binding.etPassword.setSelection(binding.etPassword.getText().length());
                 isShowPass = !isShowPass;
@@ -83,10 +84,10 @@ public class RegisterActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (isShowRePass) {
                     binding.etRePassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
-                    binding.hideShowRePass.setImageDrawable(getResources().getDrawable(R.drawable.show_pass));
+                    binding.hideShowRePass.setImageDrawable(ContextCompat.getDrawable(RegisterActivity.this, R.drawable.show_pass));
                 } else {
                     binding.etRePassword.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
-                    binding.hideShowRePass.setImageDrawable(getResources().getDrawable(R.drawable.hidden_pass));
+                    binding.hideShowRePass.setImageDrawable(ContextCompat.getDrawable(RegisterActivity.this, R.drawable.hidden_pass));
                 }
                 binding.etRePassword.setSelection(binding.etRePassword.getText().length());
                 isShowRePass = !isShowRePass;

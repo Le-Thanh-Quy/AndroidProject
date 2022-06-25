@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -83,9 +84,14 @@ import com.sinch.android.rtc.calling.CallClientListener;
 import com.sinch.android.rtc.calling.CallListener;
 import com.squareup.picasso.Picasso;
 
+import org.jitsi.meet.sdk.JitsiMeetActivity;
+import org.jitsi.meet.sdk.JitsiMeetConferenceOptions;
+import org.jitsi.meet.sdk.JitsiMeetUserInfo;
+
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -211,8 +217,32 @@ public class ChatActivity extends AppCompatActivity {
         super.onPause();
     }
 
+    boolean isJoinVideoCall = false;
     @Override
     protected void onResume() {
+        if (isJoinVideoCall) {
+            reference.child("Rooms").child(chat_room.getRoomID()).child("videoCallMember").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DataSnapshot> task) {
+                    int videoCallMember = Integer.parseInt(task.getResult().getValue().toString());
+                    reference.child("Rooms").child(chat_room.getRoomID()).child("videoCallMember").setValue(videoCallMember - 1);
+                    isJoinVideoCall = false;
+                    String time_now = String.valueOf(System.currentTimeMillis());
+                    Mess mess = new Mess();
+                    mess.setType("notification");
+                    mess.setUserId(user.getPhoneNumber());
+                    mess.setTime(time_now);
+                    if ((videoCallMember - 1) <= 0) {
+                        mess.setMessage("8__@__");
+                        reference.child("Rooms").child(chat_room.getRoomID()).child("isVideoCall").setValue(false);
+                    } else {
+                        mess.setMessage("7__@__");
+                    }
+                    reference.child("Rooms").child(chat_room.getRoomID()).child("listMess").child(time_now).setValue(mess);
+                }
+            });
+
+        }
         MainActivity.id_user = theirUser.phoneNumber;
         isSeen = true;
         reference.child("Users").child(user.getPhoneNumber()).child("status").child("is").setValue(true);
@@ -302,22 +332,27 @@ public class ChatActivity extends AppCompatActivity {
         }
 
         if (!theirUser.getUserAvatar().equals("null")) {
-            Glide.with(ChatActivity.this).load(theirUser.getUserAvatar()).centerCrop().placeholder(ChatActivity.this.getResources().getDrawable(R.drawable.profile)).listener(new RequestListener<Drawable>() {
-                @Override
-                public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                    return false;
-                }
-
-                @Override
-                public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                    BitmapDrawable drawable = (BitmapDrawable) binding.avatar.getDrawable();
-                    bitmapAvatar = drawable.getBitmap();
-                    if (chat_room.getRoomID() != null) {
-                        eventChat();
+            try {
+                Glide.with(ChatActivity.this).load(theirUser.getUserAvatar()).centerCrop().placeholder(ContextCompat.getDrawable(ChatActivity.this, R.drawable.profile)).listener(new RequestListener<Drawable>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                        return false;
                     }
-                    return false;
-                }
-            }).into(binding.avatar);
+
+                    @Override
+                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                        BitmapDrawable drawable = (BitmapDrawable) binding.avatar.getDrawable();
+                        bitmapAvatar = drawable.getBitmap();
+                        if (chat_room.getRoomID() != null) {
+                            eventChat();
+                        }
+                        return false;
+                    }
+                }).into(binding.avatar);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
         } else {
             BitmapDrawable drawable = (BitmapDrawable) binding.avatar.getDrawable();
             bitmapAvatar = drawable.getBitmap();
@@ -566,6 +601,9 @@ public class ChatActivity extends AppCompatActivity {
         layout_icon = dialog.findViewById(R.id.layout_icon);
         layout_call = dialog.findViewById(R.id.layout_call);
         layout_add_avatar = dialog.findViewById(R.id.layout_add_avatar);
+        layout_video = dialog.findViewById(R.id.layout_video);
+
+
         layout_add_avatar.setVisibility(View.GONE);
         et_name.setText(chat_room.getRoomName());
         user_name.setText(theirUser.getUserName());
@@ -580,13 +618,17 @@ public class ChatActivity extends AppCompatActivity {
         }
 
         if (!theirUser.getUserAvatar().equals("null")) {
+            try {
+                Glide.with(ChatActivity.this)
+                        .load(theirUser.getUserAvatar()) // web image url
+                        .centerInside()
+                        .error(R.drawable.profile)
+                        .placeholder(R.drawable.profile)
+                        .into(user_avatar);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
-            Glide.with(ChatActivity.this)
-                    .load(theirUser.getUserAvatar()) // web image url
-                    .centerInside()
-                    .error(R.drawable.profile)
-                    .placeholder(R.drawable.profile)
-                    .into(user_avatar);
         }
 
         addEventDialog();
@@ -669,6 +711,62 @@ public class ChatActivity extends AppCompatActivity {
                         }
                     });
 
+                }
+            }
+        });
+        layout_video.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (isFirstMess) {
+                    MyToast.show(ChatActivity.this, "Bạn chưa thể thực hiện cuộc gọi video", 0);
+                } else {
+                    reference.child("Rooms").child(chat_room.getRoomID()).child("isVideoCall").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DataSnapshot> task) {
+                            if (Boolean.TRUE.equals(task.getResult().getValue(Boolean.class))) {
+                                String time_now = String.valueOf(System.currentTimeMillis());
+                                Mess mess = new Mess();
+                                mess.setType("notification");
+                                mess.setUserId(user.getPhoneNumber());
+                                mess.setTime(time_now);
+                                mess.setMessage("6__@__");
+                                reference.child("Rooms").child(chat_room.getRoomID()).child("listMess").child(time_now).setValue(mess);
+                            } else {
+                                reference.child("Rooms").child(chat_room.getRoomID()).child("isVideoCall").setValue(true);
+                                reference.child("Rooms").child(chat_room.getRoomID()).child("videoCallMember").setValue(0);
+                                sendMess("Bắt đầu chat video", "video_call");
+                            }
+                            reference.child("Rooms").child(chat_room.getRoomID()).child("videoCallMember").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DataSnapshot> task) {
+                                    int videoCallMember = 0;
+                                    if (task.getResult().exists()) {
+                                        videoCallMember = Integer.parseInt(task.getResult().getValue().toString());
+                                    }
+                                    reference.child("Rooms").child(chat_room.getRoomID()).child("videoCallMember").setValue(videoCallMember + 1);
+                                    isJoinVideoCall = true;
+                                    try {
+                                        JitsiMeetUserInfo userInfo = new JitsiMeetUserInfo();
+                                        userInfo.setDisplayName(user.getUserName());
+                                        userInfo.setAvatar(new URL(user.getUserAvatar()));
+                                        JitsiMeetConferenceOptions options = new JitsiMeetConferenceOptions.Builder()
+                                                .setServerURL(new URL("https://meet.jit.si"))
+                                                .setRoom(chat_room.getRoomID() + "chatapp")
+                                                .setAudioOnly(false)
+                                                .setUserInfo(userInfo)
+                                                .setWelcomePageEnabled(false)
+                                                .setFeatureFlag("chat.ena bled", false)
+                                                .setFeatureFlag("invite.enabled", false)
+                                                .build();
+                                        JitsiMeetActivity.launch(ChatActivity.this, options);
+                                    } catch (
+                                            Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            });
+                        }
+                    });
                 }
             }
         });
@@ -1006,6 +1104,7 @@ public class ChatActivity extends AppCompatActivity {
             room.setRoomName(user.getUserName());
             reference.child("Users").child(theirUser.getPhoneNumber()).child("rooms").child(user.getPhoneNumber()).setValue(room);
 
+            SendNotification.send(ChatActivity.this, theirUser.getToken(), user.getUserName(), mess_content, user.getPhoneNumber(), mess.getType(), user.getUserAvatar(), false);
             firstMess(room, mess_content, time_now, mess);
 
             isFirstMess = false;

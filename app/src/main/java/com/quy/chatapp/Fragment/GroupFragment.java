@@ -187,6 +187,7 @@ public class GroupFragment extends Fragment {
                     room.setRoomTimeLastMess(idRoom);
                     reference.child("Users").child(phone).child("rooms").child(idRoom).setValue(room);
                     for (User user : ListFriendGroup.listUser) {
+                        reference.child("Rooms").child(idRoom).child("listSeen").child(user.getPhoneNumber()).child("token").setValue(user.getToken());
                         reference.child("Rooms").child(idRoom).child("listSeen").child(user.getPhoneNumber()).child("is").setValue(false);
                         reference.child("Rooms").child(idRoom).child("roomName").setValue(nameGroup);
                         reference.child("Rooms").child(idRoom).child("imageRoom").setValue("null");
